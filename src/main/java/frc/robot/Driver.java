@@ -82,6 +82,12 @@ public class Driver {
         } else {
             Objects.vision.autoLineup = false;
         }
+    }
 
+    public void pixyCamAutonomousTest() {
+        int numBallsToFind = 3;
+        if (Objects.driverJoy.getRawButton(ControllerMap.Y_BUTTON)) {
+            Objects.pixyCamOperate.fullPixyCamSequence(numBallsToFind);
+        }
     }
 }

@@ -14,6 +14,14 @@ public class Intake {
         counter = 0;
     }
 
+    /**
+     * Operates the intake
+     * @param mode
+     * <ul>
+     * <li>-1 = stop [retract intake bar and turn off motor]</li>
+     * <li>0 = extend intake bar and pull ball in</li>
+     * <li>1 = extend intake bar and push ball out</li>
+     */
     public void intake(int mode) {
         if (Objects.index.getInd0()) {
             if (counter > MagicNumbers.intakePause) {
