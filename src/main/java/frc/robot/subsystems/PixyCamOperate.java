@@ -69,6 +69,11 @@ public class PixyCamOperate {
         return ballPickedUp;
     }
 
+    /**
+     * Searches for balls, locks on to the target that the pixycam chooses, and then drives to each ball to pick it up
+     * @param numBallsToFind
+     * <ul><li>How many balls to search for and pick up</li></ul>
+     */
     public void fullPixyCamSequence(int numBallsToFind) {
         if (Objects.magicNumbers.numBallsPickedUp <= numBallsToFind && !Objects.magicNumbers.successfulCompletion) {
             if (driveToBall() == true) {
