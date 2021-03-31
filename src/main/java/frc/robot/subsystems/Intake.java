@@ -49,6 +49,9 @@ public class Intake {
         }
     }
 
+    /**
+     * Stops running the intake motor and retracts the intake bar
+     */
     public void stop() {
         Motors.intake.set(0);
         Objects.intakeSolenoidExtend.set(Value.kReverse);
