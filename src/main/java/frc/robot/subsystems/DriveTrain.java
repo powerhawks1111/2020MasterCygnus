@@ -27,6 +27,13 @@ public class DriveTrain {
         currentAngle = -1;
     }
 
+    /**
+     * Calculates the spesd to drive the motors using a quadratic equation and an input joystick value
+     * @param value
+     * <ul><li>Value of the joystick between -1 and 1, inclusive</li></ul>
+     * @return
+     * <ul><li>Motor speed percentage between -1 and 1, inclusive</li></ul>
+     */
     public double quadraticDrive(double value) { 
         double slow = 0.999999999999994 * (value * value);
         if(value < 0){
@@ -35,6 +42,13 @@ public class DriveTrain {
         return slow;
     }
 
+    /**
+     * Drives each side of the robot independently, and requires values for both the left and right motors
+     * @param left
+     * <ul><li>Left side motor percentage, from -1 to 1 inclusive</li></ul>
+     * @param right
+     * <ul><li>Right side motor percentage, from -1 to 1 inclusive</li></ul>
+     */
     public void tankDrive(double left, double right) {
         double nvar = 1;
         Motors.leftFront.set(-nvar * left);
@@ -43,6 +57,13 @@ public class DriveTrain {
         Motors.rightBack.set(nvar * right);
     }
 
+    /**
+     * Drives the left and right sides together, and calculates the speed for each motor given the forward speed and the rotational speed
+     * @param throttle
+     * <ul><li>Percentage to drive forward, from -1 to 1 inclusive</li></ul>
+     * @param turnVal
+     * <ul><li>Perventage to rotate, from -1 to 1 inclusive</li></ul>
+     */
     public void arcadeDrive(double throttle, double turnVal) {
         double nvar = 1;
         double reduceTurn = 1;
@@ -52,6 +73,11 @@ public class DriveTrain {
         Motors.rightBack.set(nvar * (throttle + turnVal * reduceTurn));
     }
 
+    /**
+     * Drives the robot forwards or backwards
+     * @param power
+     * <ul><li>Percentage to drive the robot forwards or backwards, from -1 to 1 inclusive</li></ul>
+     */
     public void powerDrive(double power) {
         Motors.leftFront.set(-power);
         Motors.leftBack.set(-power);
@@ -59,6 +85,15 @@ public class DriveTrain {
         Motors.rightBack.set(power);
     }
 
+    /**
+     * Moves the robot a specified distance with a speed/power and a forward/reverse option
+     * @param targetDistance
+     * <ul><li>The distance, in TODO: what unit?</li></ul>
+     * @param power
+     * <ul><li>Percentage of speed to drive, from -1 to 1 inclusive</li></ul>
+     * @param direction
+     * <ul><li>Forwards (true) or backwards (false)</li></ul>
+     */
     public void moveDistance(double targetDistance, double power, boolean direction) {
         if (isStart) {
             startingTicks = Motors.rightBack.getEncoder().getPosition();
@@ -100,6 +135,15 @@ public class DriveTrain {
     //     }
     // }
     
+    /**
+     * Rotates the robot to a given angle
+     * @param targetAngle
+     * <ul><li>What angle to rotate, in degrees</li></ul>
+     * @param power
+     * <ul><li>Percentage of power to use when rotating, from -1 to 1 inclusive</li></ul>
+     * @param direction
+     * <ul><li>Whether to rotate cw (false?) or ccw (true?) TODO: determine rotation direction</li></ul>
+     */
     public void turnTo(double targetAngle, double power, boolean direction) {
         if (isStart && !(Objects.navx.getAngle() == 0)) {
             startingAngle = Objects.navx.getAngle();
@@ -119,8 +163,17 @@ public class DriveTrain {
 
     double MIN_TURNPOW = 0.05;
     double MAX_TURNPOW = 1;
-
     double deltaAngle = 1;
+
+    /**
+     * Rotates the robot to a new angle, with some math to make it smoother
+     * @param targetAngle
+     * <ul><li>What angle to rotate, in degrees</li></ul>
+     * @param power
+     * <ul><li>Percentage of power to use when rotating, from -1 to 1 inclusive</li></ul>
+     * @param direction
+     * <ul><li>Whether to rotate cw (false?) or ccw (true?) TODO: determine rotation direction</li></ul>
+     */
     public void turnToNew(double targetAngle, double power, boolean direction)
     {
         if (isStart) {
@@ -143,7 +196,14 @@ public class DriveTrain {
     }
     // (MAX)/(|target|-|current|/delta)
 
-    public double getPowerShift(double curAngle, double targetAngle, double power)
+    /**
+     * Math function for the turnToNew function
+     * @param curAngle
+     * @param targetAngle
+     * @param power
+     * @return
+     */
+    private double getPowerShift(double curAngle, double targetAngle, double power)
     {
         if(deltaAngle != 0)
         {
@@ -153,14 +213,27 @@ public class DriveTrain {
         return 0;
     }
 
+    /**
+     * Is the robot driving?
+     * @return isDriving
+     * <ul><li>Boolean values of whether or not the robot is currently driving</li></ul>
+     */
     public boolean isDriving() {
         return isDriving;
     }
 
+    /**
+     * Is the robot turning?
+     * @return isTurning
+     * <ul><li>Boolean values of whether or not the robot is currently turning</li></ul>
+     */
     public boolean isTurning() {
         return isTurning;
     }
 
+    /**
+     * Stops the robot's drive motors
+     */
     public void stop() {
         powerDrive(0);
         isStart = true;
