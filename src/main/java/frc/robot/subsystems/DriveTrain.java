@@ -74,6 +74,59 @@ public class DriveTrain {
     }
 
     /**
+     * TODO: test this function!
+     * <br><br>
+     * Nathan's fixed drive function, not tested yet.
+     * <br><br>
+     * I just read through it and it doesn't seem to take into account that the front 
+     * and back motor of each side need to turn in opposite directions (-Rex)
+     * @param throttle
+     * <ul><li>Percentage to drive forward, from -1 to 1 inclusive</li></ul>
+     * @param turnVal
+     * <ul><li>Perventage to rotate, from -1 to 1 inclusive</li></ul>
+     */
+    public void arcadeDriveFixed(final double throttle, final double turnVal) {
+        double nvar = 1;
+        double reduceTurn = 1;
+        double left = (-nvar * (throttle - turnVal * reduceTurn));
+        double right = (nvar * (throttle + turnVal * reduceTurn));
+        Boolean leftIsNeg = false;
+        Boolean rightIsNeg = false;
+        //caps values and maintains ratio of values for similar turn
+        if (left>1||right>1||left<-1||right<-1){
+            //I kept getting errors with using the absolute value function so I won't use it, I'll multiply by -1
+            //stores pos/neg value of variable, and switches any negatives to positives for comparisons
+            if (left<0){
+                leftIsNeg = true;
+                left=left*-1;
+            }
+            if (right<0) {
+                rightIsNeg = true;
+                right=right*-1;
+            } 
+            if(left>right){
+                //basically 1, the maximum
+                left=left/left;
+                right=right/left;
+            } else if (right>left){
+                right=right/right;
+                left=left/right;
+            }
+            //returns variables to their original neg values, if applicable
+            if (leftIsNeg==true){
+                left=left*-1;
+            }
+            if (rightIsNeg==true){
+                right=right*-1;
+            }
+        }
+        Motors.leftFront.set(left);
+        Motors.leftBack.set(left);
+        Motors.rightFront.set(right);
+        Motors.rightBack.set(right);
+    }
+
+    /**
      * Drives the robot forwards or backwards
      * @param power
      * <ul><li>Percentage to drive the robot forwards or backwards, from -1 to 1 inclusive</li></ul>
