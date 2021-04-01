@@ -16,6 +16,7 @@ public class Driver {
         activeClimb();
         autonomousLineUp();
         turnLightsOff();
+        pixyCamAutonomousTest();
     }
 
     public void arcadeDrive() {
@@ -55,7 +56,6 @@ public class Driver {
             && !Objects.driverJoy.getRawButton(ControllerMap.L_STICKD)) {
             // Objects.visionSystems.turnLightOff();
             Objects.visionSystems.turnLightOn();
-
         }
     }
 
