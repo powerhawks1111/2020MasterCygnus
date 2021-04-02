@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class Climb {
     
-	public Climb() {
+    public Climb() {
         
     }
 
@@ -16,7 +16,7 @@ public class Climb {
     public void retractPiston() {
         Objects.climbSolenoid1.set(Value.kReverse);
         // Objects.climbSolenoid2.set(Value.kForward);
-	}
+    }
 
     /**
      * Extends the lift pistons
