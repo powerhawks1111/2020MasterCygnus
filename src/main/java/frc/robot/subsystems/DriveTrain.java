@@ -58,7 +58,7 @@ public class DriveTrain {
     }
 
     /**
-     * Drives the left and right sides together, and calculates the speed for each motor given the forward speed and the rotational speed
+     * Drives the left and right sides together, and calculates the speed for each motor given the forward speed and the yaw rotational speed
      * @param throttle
      * <ul><li>Percentage to drive forward, from -1 to 1 inclusive</li></ul>
      * @param turnVal
@@ -124,6 +124,49 @@ public class DriveTrain {
         Motors.leftBack.set(left);
         Motors.rightFront.set(right);
         Motors.rightBack.set(right);
+    }
+
+    /**
+     * TODO: test this function!
+     * <br><br>
+     * Rex's version of the fixed drive function, not tested yet.
+     * <br><br>
+     * Drives the left and right sides together, and calculates the speed for each motor given the forward speed and the yaw rotational speed
+     * @param throttle
+     * <ul><li>Percentage to drive forward, from -1 to 1 inclusive</li></ul>
+     * @param turnVal
+     * <ul><li>Perventage to rotate, from -1 to 1 inclusive</li></ul>
+     */
+    public void arcadeDriveFixed2(double throttle, double turnVal) {
+        double nvar = 1; //dampens the maximum speed if the robot is too fast
+        double reduceTurn = 1; //dampens the maximum yaw rotation
+        double raw_left = (-nvar * (throttle - turnVal * reduceTurn));
+        double raw_right = (nvar * (throttle + turnVal * reduceTurn));
+        double corrected_left = raw_left;
+        double corrected_right = raw_right;
+
+        if (raw_left > 1) {
+            corrected_left = 1;
+            corrected_right = raw_right / raw_left;
+        }
+        else if (raw_left < -1) {
+            corrected_left = -1;
+            corrected_right = raw_right / raw_left;
+        }
+
+        if (raw_right > 1) {
+            corrected_right = 1;
+            corrected_left = raw_left / raw_right;
+        }
+        else if (raw_right < -1) {
+            corrected_right = -1;
+            corrected_left = raw_left / raw_right;
+        }
+
+        Motors.leftFront.set(corrected_left);
+        Motors.leftBack.set(corrected_left);
+        Motors.rightFront.set(corrected_right);
+        Motors.rightBack.set(corrected_right);
     }
 
     /**
