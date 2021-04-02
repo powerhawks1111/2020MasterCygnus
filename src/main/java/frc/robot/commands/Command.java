@@ -6,9 +6,9 @@ public interface Command {
 
     public boolean complete = false;
 
-    public void execute(); 
+    public void execute();
 
     public void stop();
 
-    public boolean isComplete(); 
+    public boolean isComplete();
 }
