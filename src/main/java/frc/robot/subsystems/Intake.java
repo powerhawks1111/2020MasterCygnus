@@ -18,9 +18,9 @@ public class Intake {
      * Operates the intake
      * @param mode
      * <ul>
-     * <li>-1 = stop [retract intake bar and turn off motor]</li>
-     * <li>0 = extend intake bar and pull ball in</li>
-     * <li>1 = extend intake bar and push ball out</li>
+     * <li>-1 = stop [retract intake bar and turn off motor] (defaultIntake)</li>
+     * <li>0 = extend intake bar and pull ball in (intake)</li>
+     * <li>1 = extend intake bar and push ball out (purgeIntake)</li>
      */
     public void intake(int mode) {
         if (Objects.index.getInd0()) {
