@@ -10,7 +10,7 @@ public class PixyCamOperate {
     public int pixyLineUp() {
         Objects.pixyCamVision.updatePixyCamData();
         int X_Position = Objects.pixyCamVision.getX();
-        if (X_Position < 5 && X_Position > -5) {
+        if (X_Position < 5 && X_Position > -5) { //TODO change the margin of error
             Objects.driveTrain.tankDrive(Objects.pixyCamVision.pixyCamSpeedLeft(X_Position), Objects.pixyCamVision.pixyCamSpeedRight(X_Position)); //TODO: Might need to be negative values because intake is on the back
         }
         else {
