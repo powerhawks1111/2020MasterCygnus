@@ -11,7 +11,7 @@ public class Driver {
 
     public void drive() {
         // arcadeDrive();
-        quadDrive();
+        cubeDrive();
         // autonomousShoot();
         activeClimb();
         autonomousLineUp();
@@ -30,13 +30,13 @@ public class Driver {
             Objects.driveTrain.stop();
         }
     }
-    public void quadDrive() {
+    public void cubeDrive() {
         if (Objects.driverJoy.getRawAxis(ControllerMap.L_STICKY) >= 0.03 
             || Objects.driverJoy.getRawAxis(ControllerMap.R_STICKX) >= 0.03
             || Objects.driverJoy.getRawAxis(ControllerMap.L_STICKY) <= -0.03
             || Objects.driverJoy.getRawAxis(ControllerMap.R_STICKX) <= -0.03) {
-            Objects.driveTrain.arcadeDrive(Objects.driveTrain.quadraticDrive(Objects.driverJoy.getRawAxis(ControllerMap.L_STICKY)), 
-            (Objects.driveTrain.quadraticDrive(Objects.driverJoy.getRawAxis(ControllerMap.R_STICKX))));
+            Objects.driveTrain.arcadeDrive(Objects.driveTrain.cubicDrive(Objects.driverJoy.getRawAxis(ControllerMap.L_STICKY)), 
+            (Objects.driveTrain.cubicDrive(Objects.driverJoy.getRawAxis(ControllerMap.R_STICKX))));
         } else if(!Objects.vision.autoLineup) {
             Objects.driveTrain.stop();
         }
