@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import frc.robot.variables.Motors;
 import frc.robot.variables.Objects;
 import frc.robot.variables.MagicNumbers;
-
+import java.lang.Math;
 public class DriveTrain {
 
     public boolean isDriving;
@@ -28,18 +28,15 @@ public class DriveTrain {
     }
 
     /**
-     * Calculates the spesd to drive the motors using a quadratic equation and an input joystick value
+     * Calculates the spesd to drive the motors using a cubic (just x^3) equation and an input joystick value
      * @param value
      * <ul><li>Value of the joystick between -1 and 1, inclusive</li></ul>
-     * @return
+     * @return cubicFn
      * <ul><li>Motor speed percentage between -1 and 1, inclusive</li></ul>
      */
-    public double quadraticDrive(double value) { 
-        double slow = 0.999999999999994 * (value * value);
-        if(value < 0){
-            slow = -slow;
-        }
-        return slow;
+    public double cubicDrive(double value) {
+        double cubicFn = Math.pow(value, 3);
+        return cubicFn;
     }
 
     /**
