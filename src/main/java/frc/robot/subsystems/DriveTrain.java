@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import frc.robot.variables.Motors;
 import frc.robot.variables.Objects;
 import frc.robot.variables.MagicNumbers;
-
+import java.lang.Math;
 public class DriveTrain {
 
     public boolean isDriving;
@@ -27,14 +27,25 @@ public class DriveTrain {
         currentAngle = -1;
     }
 
-    public double quadraticDrive(double value) { 
-        double slow = 0.999999999999994 * (value * value);
-        if(value < 0){
-            slow = -slow;
-        }
-        return slow;
+    /**
+     * Calculates the spesd to drive the motors using a cubic (just x^3) equation and an input joystick value
+     * @param value
+     * <ul><li>Value of the joystick between -1 and 1, inclusive</li></ul>
+     * @return cubicFn
+     * <ul><li>Motor speed percentage between -1 and 1, inclusive</li></ul>
+     */
+    public double cubicDrive(double value) {
+        double cubicFn = Math.pow(value, 3);
+        return cubicFn;
     }
 
+    /**
+     * Drives each side of the robot independently, and requires values for both the left and right motors
+     * @param left
+     * <ul><li>Left side motor percentage, from -1 to 1 inclusive</li></ul>
+     * @param right
+     * <ul><li>Right side motor percentage, from -1 to 1 inclusive</li></ul>
+     */
     public void tankDrive(double left, double right) {
         double nvar = 1;
         Motors.leftFront.set(-nvar * left);
@@ -43,6 +54,13 @@ public class DriveTrain {
         Motors.rightBack.set(nvar * right);
     }
 
+    /**
+     * Drives the left and right sides together, and calculates the speed for each motor given the forward speed and the yaw rotational speed
+     * @param throttle
+     * <ul><li>Percentage to drive forward, from -1 to 1 inclusive</li></ul>
+     * @param turnVal
+     * <ul><li>Perventage to rotate, from -1 to 1 inclusive</li></ul>
+     */
     public void arcadeDrive(double throttle, double turnVal) {
         double nvar = 1;
         double reduceTurn = 1;
@@ -52,6 +70,107 @@ public class DriveTrain {
         Motors.rightBack.set(nvar * (throttle + turnVal * reduceTurn));
     }
 
+    /**
+     * TODO: test this function!
+     * <br><br>
+     * Nathan's fixed drive function, not tested yet.
+     * <br><br>
+     * I just read through it and it doesn't seem to take into account that the front 
+     * and back motor of each side need to turn in opposite directions (-Rex)
+     * @param throttle
+     * <ul><li>Percentage to drive forward, from -1 to 1 inclusive</li></ul>
+     * @param turnVal
+     * <ul><li>Perventage to rotate, from -1 to 1 inclusive</li></ul>
+     */
+    public void arcadeDriveFixed(final double throttle, final double turnVal) {
+        double nvar = 1;
+        double reduceTurn = 1;
+        double left = (-nvar * (throttle - turnVal * reduceTurn));
+        double right = (nvar * (throttle + turnVal * reduceTurn));
+        Boolean leftIsNeg = false;
+        Boolean rightIsNeg = false;
+        //caps values and maintains ratio of values for similar turn
+        if (left>1||right>1||left<-1||right<-1){
+            //I kept getting errors with using the absolute value function so I won't use it, I'll multiply by -1
+            //stores pos/neg value of variable, and switches any negatives to positives for comparisons
+            if (left<0){
+                leftIsNeg = true;
+                left=left*-1;
+            }
+            if (right<0) {
+                rightIsNeg = true;
+                right=right*-1;
+            } 
+            if(left>right){
+                //basically 1, the maximum
+                left=left/left;
+                right=right/left;
+            } else if (right>left){
+                right=right/right;
+                left=left/right;
+            }
+            //returns variables to their original neg values, if applicable
+            if (leftIsNeg==true){
+                left=left*-1;
+            }
+            if (rightIsNeg==true){
+                right=right*-1;
+            }
+        }
+        Motors.leftFront.set(left);
+        Motors.leftBack.set(left);
+        Motors.rightFront.set(right);
+        Motors.rightBack.set(right);
+    }
+
+    /**
+     * TODO: test this function!
+     * <br><br>
+     * Rex's version of the fixed drive function, not tested yet.
+     * <br><br>
+     * Drives the left and right sides together, and calculates the speed for each motor given the forward speed and the yaw rotational speed
+     * @param throttle
+     * <ul><li>Percentage to drive forward, from -1 to 1 inclusive</li></ul>
+     * @param turnVal
+     * <ul><li>Perventage to rotate, from -1 to 1 inclusive</li></ul>
+     */
+    public void arcadeDriveFixed2(double throttle, double turnVal) {
+        double nvar = 1; //dampens the maximum speed if the robot is too fast
+        double reduceTurn = 1; //dampens the maximum yaw rotation
+        double raw_left = (-nvar * (throttle - turnVal * reduceTurn));
+        double raw_right = (nvar * (throttle + turnVal * reduceTurn));
+        double corrected_left = raw_left;
+        double corrected_right = raw_right;
+
+        if (raw_left > 1) {
+            corrected_left = 1;
+            corrected_right = raw_right / raw_left;
+        }
+        else if (raw_left < -1) {
+            corrected_left = -1;
+            corrected_right = raw_right / raw_left;
+        }
+
+        if (raw_right > 1) {
+            corrected_right = 1;
+            corrected_left = raw_left / raw_right;
+        }
+        else if (raw_right < -1) {
+            corrected_right = -1;
+            corrected_left = raw_left / raw_right;
+        }
+
+        Motors.leftFront.set(corrected_left);
+        Motors.leftBack.set(corrected_left);
+        Motors.rightFront.set(corrected_right);
+        Motors.rightBack.set(corrected_right);
+    }
+
+    /**
+     * Drives the robot forwards or backwards
+     * @param power
+     * <ul><li>Percentage to drive the robot forwards or backwards, from -1 to 1 inclusive</li></ul>
+     */
     public void powerDrive(double power) {
         Motors.leftFront.set(-power);
         Motors.leftBack.set(-power);
@@ -59,6 +178,15 @@ public class DriveTrain {
         Motors.rightBack.set(power);
     }
 
+    /**
+     * Moves the robot a specified distance with a speed/power and a forward/reverse option
+     * @param targetDistance
+     * <ul><li>The distance, in TODO: what unit?</li></ul>
+     * @param power
+     * <ul><li>Percentage of speed to drive, from -1 to 1 inclusive</li></ul>
+     * @param direction
+     * <ul><li>Forwards (true) or backwards (false)</li></ul>
+     */
     public void moveDistance(double targetDistance, double power, boolean direction) {
         if (isStart) {
             startingTicks = Motors.rightBack.getEncoder().getPosition();
@@ -100,6 +228,15 @@ public class DriveTrain {
     //     }
     // }
     
+    /**
+     * Rotates the robot to a given angle
+     * @param targetAngle
+     * <ul><li>What angle to rotate, in degrees</li></ul>
+     * @param power
+     * <ul><li>Percentage of power to use when rotating, from -1 to 1 inclusive</li></ul>
+     * @param direction
+     * <ul><li>Whether to rotate cw (false?) or ccw (true?) TODO: determine rotation direction</li></ul>
+     */
     public void turnTo(double targetAngle, double power, boolean direction) {
         if (isStart && !(Objects.navx.getAngle() == 0)) {
             startingAngle = Objects.navx.getAngle();
@@ -119,8 +256,17 @@ public class DriveTrain {
 
     double MIN_TURNPOW = 0.05;
     double MAX_TURNPOW = 1;
-
     double deltaAngle = 1;
+
+    /**
+     * Rotates the robot to a new angle, with some math to make it smoother
+     * @param targetAngle
+     * <ul><li>What angle to rotate, in degrees</li></ul>
+     * @param power
+     * <ul><li>Percentage of power to use when rotating, from -1 to 1 inclusive</li></ul>
+     * @param direction
+     * <ul><li>Whether to rotate cw (false?) or ccw (true?) TODO: determine rotation direction</li></ul>
+     */
     public void turnToNew(double targetAngle, double power, boolean direction)
     {
         if (isStart) {
@@ -143,7 +289,14 @@ public class DriveTrain {
     }
     // (MAX)/(|target|-|current|/delta)
 
-    public double getPowerShift(double curAngle, double targetAngle, double power)
+    /**
+     * Math function for the turnToNew function
+     * @param curAngle
+     * @param targetAngle
+     * @param power
+     * @return
+     */
+    private double getPowerShift(double curAngle, double targetAngle, double power)
     {
         if(deltaAngle != 0)
         {
@@ -153,14 +306,27 @@ public class DriveTrain {
         return 0;
     }
 
+    /**
+     * Is the robot driving?
+     * @return isDriving
+     * <ul><li>Boolean values of whether or not the robot is currently driving</li></ul>
+     */
     public boolean isDriving() {
         return isDriving;
     }
 
+    /**
+     * Is the robot turning?
+     * @return isTurning
+     * <ul><li>Boolean values of whether or not the robot is currently turning</li></ul>
+     */
     public boolean isTurning() {
         return isTurning;
     }
 
+    /**
+     * Stops the robot's drive motors
+     */
     public void stop() {
         powerDrive(0);
         isStart = true;

@@ -21,6 +21,9 @@ public class Outtake {
     public double kD = 0.0000000001;
     boolean charging = false;
 
+    /**
+     * Constructor
+     */
     public Outtake() {
         isRev = false;
         pidController = Motors.outLeader.getPIDController();
@@ -40,6 +43,9 @@ public class Outtake {
         pidController.setD(kD);
     }
 
+    /**
+     * Revs the motor to 4000 rpm using the pidController velocity control type
+     */
     public void revUp() { 
         pidController.setReference(-4000, ControlType.kVelocity);
         Motors.outFollower.follow(Motors.outLeader, true);
@@ -98,6 +104,11 @@ public class Outtake {
         } 
     }
 
+    /**
+     * Calculates the velocity the motor needs to fire the ball a certain distance
+     * @param distance
+     * @return
+     */
     public double autoVelocity(double distance) {
         double d = distance;
         double velocity;

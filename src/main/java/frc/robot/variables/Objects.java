@@ -2,6 +2,7 @@ package frc.robot.variables;
 
 import frc.robot.subsystems.*;
 import frc.robot.Robot;
+//import frc.robot.variables.*; //not needed because this class is already in variables directory
 import frc.robot.commands.Scheduler;
 import com.revrobotics.CANEncoder;
 import edu.wpi.first.wpilibj.Compressor;
@@ -24,7 +25,10 @@ public class Objects {
     public static Intake intake = new Intake();
     public static Joystick driverJoy = new Joystick(ControllerMap.DRIVER_PORT);
     public static Joystick operatorJoy = new Joystick(ControllerMap.OPERATOR_PORT);
+    public static MagicNumbers magicNumbers = new MagicNumbers();
     public static Outtake outtake = new Outtake();
+    public static PixyCamVision pixyCamVision = new PixyCamVision();
+    public static PixyCamOperate pixyCamOperate = new PixyCamOperate();
     public static Relay relay = new Relay(0, Direction.kReverse);
     public static Scheduler scheduler = new Scheduler();
     public static Vision vision = new Vision();

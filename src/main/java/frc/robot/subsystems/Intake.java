@@ -14,6 +14,14 @@ public class Intake {
         counter = 0;
     }
 
+    /**
+     * Operates the intake
+     * @param mode
+     * <ul>
+     * <li>-1 = stop [retract intake bar and turn off motor] (defaultIntake)</li>
+     * <li>0 = extend intake bar and pull ball in (intake)</li>
+     * <li>1 = extend intake bar and push ball out (purgeIntake)</li>
+     */
     public void intake(int mode) {
         if (Objects.index.getInd0()) {
             if (counter > MagicNumbers.intakePause) {
@@ -41,6 +49,9 @@ public class Intake {
         }
     }
 
+    /**
+     * Stops running the intake motor and retracts the intake bar
+     */
     public void stop() {
         Motors.intake.set(0);
         Objects.intakeSolenoidExtend.set(Value.kReverse);
