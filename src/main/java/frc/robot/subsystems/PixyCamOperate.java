@@ -39,9 +39,12 @@ public class PixyCamOperate {
                 hasLinedUp = true;
             }
         }
-        else if (hasLinedUp == true) {
+        if (hasLinedUp == true) {
             System.out.println("Robot is lined up with the ball.");
             Objects.driveTrain.arcadeDrive(0, 0);
+        }
+        else {
+            System.out.println("Robot is still lining up precisely.");
         }
         return hasLinedUp;
     }
