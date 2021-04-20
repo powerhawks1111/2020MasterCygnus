@@ -35,7 +35,7 @@ public class DriveTrain {
      * <ul><li>Motor speed percentage between -1 and 1, inclusive</li></ul>
      */
     public double cubicDrive(double value) {
-        double cubicFn = Math.pow(value, 3);
+        double cubicFn = value * value * value;
         return cubicFn;
     }
 
@@ -62,12 +62,13 @@ public class DriveTrain {
      * <ul><li>Perventage to rotate, from -1 to 1 inclusive</li></ul>
      */
     public void arcadeDrive(double throttle, double turnVal) {
-        double nvar = 1;
-        double reduceTurn = 1;
-        Motors.leftFront.set(-nvar * (throttle - turnVal * reduceTurn));
-        Motors.leftBack.set(-nvar * (throttle - turnVal * reduceTurn));
-        Motors.rightFront.set(nvar * (throttle + turnVal * reduceTurn));
-        Motors.rightBack.set(nvar * (throttle + turnVal * reduceTurn));
+        //+ dir = outtake forward, - dir = intake forward
+        double nvar = 0.8;
+        int dir = 1;
+        Motors.leftFront.set(-nvar * dir * (throttle - dir * turnVal));
+        Motors.leftBack.follow(Motors.leftFront, false);
+        Motors.rightFront.set(nvar * dir * (throttle + dir * turnVal));
+        Motors.rightBack.follow(Motors.rightFront, false);
     }
 
     /**
