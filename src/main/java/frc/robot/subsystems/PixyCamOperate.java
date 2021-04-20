@@ -3,6 +3,23 @@ package frc.robot.subsystems;
 import frc.robot.variables.Objects;
 
 public class PixyCamOperate {
+
+    /**
+     * Prints out values from the pixycam to test the connection.
+     */
+    public void pixyCamValuesPrintout() {
+        Objects.pixyCamVision.updatePixyCamData();
+
+        System.out.println("PixyCam Values: ");
+        System.out.println("Sig: " + Objects.pixyCamVision.getSig());
+        System.out.println("X-Position: " + Objects.pixyCamVision.getX());
+        System.out.println("Y-Position: " + Objects.pixyCamVision.getY());
+        System.out.println("Width: " + Objects.pixyCamVision.getWidth());
+        System.out.println("Height: " + Objects.pixyCamVision.getHeight());
+
+        System.out.println("\n\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n");
+    }
+
     /**
      * Takes the position of the target that the PixyCam has selected, begins turning towards that target, and returns the current X position
      * @return X_Position
@@ -28,6 +45,7 @@ public class PixyCamOperate {
         int marginOfError = 15; //TODO: Change this to the correct +/- margin of error that the ball can be off of center
         int currXPosition;
         boolean hasLinedUp = false;
+        Objects.pixyCamVision.updatePixyCamData();
         if (Objects.pixyCamVision.getWidth() < minWidth) { //if there are no valid targets, continue rotating
             System.out.println("Turning and searching for balls.");
             Objects.driveTrain.arcadeDrive(0, 0.1);
@@ -51,13 +69,17 @@ public class PixyCamOperate {
 
     /**
      * Full sequence to look for and pick up one ball
+     * 
+     * If the robot is lined up with the ball, the robot drives forward at 10% power. When it gets close enough to the ball, 
+     * it switches to intaking and moving a specific distance.
      * @return ballPickedUp - whether or not the robot has made an attempt at intaking a ball
      */
     public boolean driveToBall() {
-        int maxWidth = 200; //TODO: Change this to the correct maximum number of pixels wide a ball will be when it is in front of the intake
-        int minY = 100; //TODO: Change this to the correct minimum height that the ball will be before the intake should be activated
+        int maxWidth = 75; //TODO: Change this to the correct maximum number of pixels wide a ball will be when it is in front of the intake
+        int minY = 50; //TODO: Change this to the correct minimum height that the ball will be before the intake should be activated
         boolean ballPickedUp = false;
         double drivingSpeed = 0.1; //TODO: Perentage of power that the robot should drive towards the ball with, might need to be negative because intake is on the "back"
+        Objects.pixyCamVision.updatePixyCamData();
         if (searchForBalls() == true && Objects.pixyCamVision.getWidth() < maxWidth) {
             System.out.println("Driving towards ball.");
             Objects.driveTrain.arcadeDrive(drivingSpeed, 0);

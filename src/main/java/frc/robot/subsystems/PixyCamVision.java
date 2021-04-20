@@ -43,8 +43,7 @@ public class PixyCamVision {
     private void updateData() {
         if (readByte() == 85) { // 85 = 01010101 = 55
             if (readByte() == -86) { // -86 = 10101010 = AA
-                if (readByte() == 85) { // The I2C stream will send these expected test bits to make sure the conenction
-                                        // is good
+                if (readByte() == 85) { // The I2C stream will send these expected test bits to make sure the conenction is good
                     if (readByte() == -86) {
                         checkSum = readShort();
                         sig = readShort();
@@ -77,42 +76,34 @@ public class PixyCamVision {
     }
 
     public int getCheckSum() {
-        System.out.println("Checksum: " + checkSum);
         return checkSum;
     }
 
     public int getSig() {
-        System.out.println("sig: " + sig);
         return sig;
     }
 
     public int getX() {
-        System.out.println("x: " + x);
         return x;
     }
 
     public int getWidth() {
-        System.out.println("width " + width);
         return width;
     }
 
     public int getY() {
-        System.out.println("Y " + y);
         return y;
     }
 
     public int getHeight() {
-        System.out.println("height " + height);
         return height;
     }
 
     public void updatePixyCamData() {
         try {
             updateData();
-            System.out.println("PixyCam X-Val: " + x);
-
         } catch (Exception e) {
-            System.out.println("PixyCam had an error! Line 111 of PixyCamVision.java!");
+            System.out.println("PixyCam had an error! Line 106 of PixyCamVision.java!");
         }
     }
 
