@@ -35,4 +35,3 @@ public class Objects {
     public static VisionSystems visionSystems = new VisionSystems();
     public static AHRS navx = new AHRS();
 }
-

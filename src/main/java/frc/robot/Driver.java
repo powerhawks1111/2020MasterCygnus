@@ -10,8 +10,8 @@ public class Driver {
     }
 
     public void drive() {
-        // arcadeDrive();
-        cubeDrive();
+        arcadeDrive();
+        // cubeDrive();
         // autonomousShoot();
         activeClimb();
         autonomousLineUp();
@@ -85,9 +85,8 @@ public class Driver {
     }
 
     public void pixyCamAutonomousTest() {
-        int numBallsToFind = 3;
         if (Objects.driverJoy.getRawButton(ControllerMap.Y_BUTTON)) {
-            Objects.pixyCamOperate.fullPixyCamSequence(numBallsToFind);
+            Objects.pixyCamOperate.pixyCamValuesPrintout();
         }
     }
 }
