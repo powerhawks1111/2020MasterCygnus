@@ -3,10 +3,10 @@
  */
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.I2C;
+//import edu.wpi.first.wpilibj.I2C.Port;
+//import edu.wpi.first.wpilibj.TimedRobot;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //import edu.wpi.first.wpilibj.IterativeRobot;
 
@@ -16,26 +16,26 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 //import com.ctre.phoenix.motorcontrol.ControlMode;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+//import java.nio.ByteBuffer;
+//import java.nio.ByteOrder;
 
 import java.util.ArrayList;
 
 import  frc.robot.subsystems.pixy2api.*;
 import  frc.robot.subsystems.pixy2api.Pixy2CCC.Block;
-import edu.wpi.first.wpilibj.SerialPort;
+//import edu.wpi.first.wpilibj.SerialPort;
 
 public class rewrittenPixyCamVision {
     
     public Pixy2 pixycam = Pixy2.createInstance(Pixy2.LinkType.I2C);//new
     int temp;
     int i;
-    private int checkSum; //WE KNOWWW
-    private int sig;
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    //private int checkSum; //WE KNOWWW
+    //private int sig;
+    //private int x;
+    //private int y;
+    //private int width;
+    //private int height;
      //new
     public void getPixyVariables() {
         
