@@ -25,7 +25,7 @@ import  frc.robot.subsystems.pixy2api.*;
 import  frc.robot.subsystems.pixy2api.Pixy2CCC.Block;
 //import edu.wpi.first.wpilibj.SerialPort;
 
-public class rewrittenPixyCamVision {
+public class FixedPixyCamVision {
     
     public Pixy2 pixycam = Pixy2.createInstance(Pixy2.LinkType.I2C);//new
     int temp;
@@ -37,7 +37,11 @@ public class rewrittenPixyCamVision {
     //private int width;
     //private int height;
      //new
-    public void getPixyVariables() {
+     public FixedPixyCamVision() {
+        // constructor
+    }
+
+     public void getPixyVariables() {
         
         pixycam.init(1);  //don't know if necessary
         pixycam.getCCC().getBlocks(false);
@@ -48,11 +52,7 @@ public class rewrittenPixyCamVision {
         blocks.get(0).print();
 
     }
-    public rewrittenPixyCamVision () {
-        // constructor
-    }
-
- 
+    
     /**
      * Takes in the x-position of the target the PixyCam has selected and calculates
      * the speed that the left set of motors should run in order to capture the ball

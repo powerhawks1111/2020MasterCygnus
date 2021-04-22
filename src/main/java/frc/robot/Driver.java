@@ -86,7 +86,7 @@ public class Driver {
 
     public void pixyCamAutonomousTest() {
         if (Objects.driverJoy.getRawButton(ControllerMap.Y_BUTTON)) {
-            Objects.pixyCamOperate.pixyCamValuesPrintout();
+            Objects.fixedPixyCamVision.getPixyVariables();
         }
     }
 }

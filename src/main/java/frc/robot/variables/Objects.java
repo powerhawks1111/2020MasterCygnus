@@ -29,6 +29,7 @@ public class Objects {
     public static Outtake outtake = new Outtake();
     public static PixyCamVision pixyCamVision = new PixyCamVision();
     public static PixyCamOperate pixyCamOperate = new PixyCamOperate();
+    public static FixedPixyCamVision fixedPixyCamVision = new FixedPixyCamVision();
     public static Relay relay = new Relay(0, Direction.kReverse);
     public static Scheduler scheduler = new Scheduler();
     public static Vision vision = new Vision();
