@@ -1,13 +1,13 @@
 package frc.robot.subsystems;
 
 import frc.robot.variables.Objects;
-
+import java.util.concurrent.TimeUnit;
 public class PixyCamOperate {
 
     /**
      * Prints out values from the pixycam to test the connection.
      */
-    public void pixyCamValuesPrintout() {
+     public void pixyCamValuesPrintout() {
         Objects.pixyCamVision.updatePixyCamData();
 
         System.out.println("PixyCam Values: ");
@@ -35,7 +35,54 @@ public class PixyCamOperate {
         }
         return X_Position;
     }
+    public String lineUp(){
+        int x = Objects.fixedPixyCamVision.getPixyX();
+        //center of intake 170
+        if (x!=-1)  {
+            if (x>190){
+                return("Right");
+            } else if (x<150){
+                return("Left");
+            }else {
+                return("Straight");
+            }
+        } 
+        else{
+        return("Obey Driver");
+        } 
+    }
+    public String getY(){
+        int y= Objects.fixedPixyCamVision.getPixyY();
+        if (y>100){
+            return ("Able");
+            
+        } else {
+            return ("Unable");
+        }
+    }
+    public void getBall(){
+        String command= lineUp();
+        if (command!="Obey Driver"){
+            if (lineUp()=="Straight"&&getY()=="Able"){
+                Objects.driveTrain.tankDrive(.2, .2);
+                System.out.println("GET IT!");
+            } else if (lineUp()=="Straight"){
+                Objects.driveTrain.tankDrive(.15, .15);
+                System.out.println("STRAIGHT!");
+            }
+            else if (lineUp()=="Right"){
+                Objects.driveTrain.arcadeDrive(.2, .15);
+                System.out.println("RIGHT!");
 
+            }else if (lineUp()=="Left"){
+                Objects.driveTrain.tankDrive(.15, .2);
+                System.out.println("LEFT!");
+            }
+        }
+        
+    
+    }
+    
     /**
      * Rotates the robot until it finds a ball, then precisely rotates so the ball is in the center of the field of view.
      * @return

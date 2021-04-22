@@ -129,6 +129,7 @@ public class Pixy2 {
 				// Gets version and resolution to check if communication is successful and stores for future use
 				if (getVersion() >= 0) {
 					getResolution();
+					System.out.println("Initialized");
 					return PIXY_RESULT_OK;
 				}
 				try {
