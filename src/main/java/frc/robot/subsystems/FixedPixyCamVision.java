@@ -50,7 +50,7 @@ public class FixedPixyCamVision {
         System.out.println(blocks);
         System.out.println(blocks.get(0).getX());
         blocks.get(0).print();
-
+        System.out.println("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
     }
     
     /**
