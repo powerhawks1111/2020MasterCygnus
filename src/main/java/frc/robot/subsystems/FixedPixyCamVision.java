@@ -30,84 +30,79 @@ public class FixedPixyCamVision {
     boolean isCamera = false; //camera isn't there, sets up if statement to initialize
     int state =-1; //changed in if statement
     int n=0;
-    //int temp;
-    //int i;
-        
-    //private int checkSum; //WE KNOWWW
-    //private int sig;
-    //private int x;
-    //private int y;
-    //private int width;
-    //private int height;
-     //new
-     public FixedPixyCamVision() {
+
+    public FixedPixyCamVision() {
         // constructor
     }
 
-    public int smoothX(){//SMOOTHS OUT CHAOTIC READINGS
+    public int smoothX() {//SMOOTHS OUT CHAOTIC READINGS
         int i;
-        int value=0;
-        int numReadings=10; //average of 10 readings
-        if (getPixyX() !=-1){ //if no error
-            for (i=0; i<numReadings; i++){
-                value=value+getPixyX(); //get sum of values
-                //should we add delay in here?
+        double value = 0;
+        int numReadings = 10; //average of 10 readings
+
+        if (getPixyX() != -1) { //if no error
+            for (i = 0; i < numReadings; i++) {
+                value = value + getPixyX(); //get sum of values
             }
-            value=value/numReadings; //what will happen here? We could get a decimal
-            Math.round(value);
-            return(value);
-        } else {
+            value = value / numReadings; //what will happen here? We could get a decimal
+            return((int)value);
+        }
+
+        else {
             return -1; //continues returning error
         }
     }
 
-    public int smoothY(){//same thing as smoothX
+    public int smoothY() {//same thing as smoothX
         int i;
-        int value=0;
+        double value=0;
         int numReadings=10; //average of 10 readings
-        if (getPixyX() !=-1){ //if no error
-            for (i=0; i<numReadings; i++){
-                value=value+getPixyY(); //get sum of values
-                //should we add delay in here?
+
+        if (getPixyX() != -1) { //if no error
+            for (i = 0; i < numReadings; i++) {
+                value = value + getPixyY(); //get sum of values
             }
-            value=value/numReadings; //what will happen here? We could get a decimal
-            Math.round(value);
-            return(value);
-        } else {
+            value = value / numReadings; //what will happen here? We could get a decimal
+            return((int)value);
+        }
+
+        else {
             return -1; //continues returning error
         }
     }
 
      public int getPixyX() {//gets X value fro pixycam
-        if (!isCamera){ //initializes if not initialized
-            state=pixycam.init();
+        if (!isCamera) { //initializes if not initialized
+            state = pixycam.init();
         }
-        isCamera = state>=0;
+
+        isCamera = state >= 0;
         pixycam.getCCC().getBlocks(false); //don't wait for a ball, just give us data
-        ArrayList<Block> blocks= pixycam.getCCC().getBlockCache(); //give us data in an array
+        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache(); //give us data in an array
         
         try { //try to get the x value, if no ball, we'll catch the error and return -1 as error
-        return(blocks.get(0).getX());
+            return(blocks.get(0).getX());
         }
         catch (Exception e) {
-            return (-1);
+            return(-1);
         }
         
     }
     
     public int getPixyY() { //same procedure as getPixyX, just with the y value
         if (!isCamera){
-            state=pixycam.init();
+            state = pixycam.init();
         }
-        isCamera = state>=0;
+
+        isCamera = state >= 0;
         pixycam.getCCC().getBlocks(false);
         ArrayList<Block> blocks= pixycam.getCCC().getBlockCache();
         
         try {
-        return(blocks.get(0).getY());
+            return(blocks.get(0).getY());
         }
         catch (Exception e) {
-            return (-1);
+            return(-1);
         }
         
     }
