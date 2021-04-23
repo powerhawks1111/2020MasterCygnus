@@ -62,30 +62,38 @@ public class FixedPixyCamVision {
         }
     }
 
-     public int getPixyX() {//gets X value fro pixycam
+    /**
+     * Uses the Pixy2 API to request and return the X-position of the first PixyCam target
+     * @return X-Position (in pixels from the left of the image) of the first Pixy target
+     */
+     public int getPixyX() {
         if (!isCamera) { //initializes if not initialized
             state = pixycam.init();
+            isCamera = state >= 0;
         }
 
-        isCamera = state >= 0;
-        pixycam.getCCC().getBlocks(false); //don't wait for a ball, just give us data
-        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache(); //give us data in an array
+        pixycam.getCCC().getBlocks(false);
+        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
         
-        try { //try to get the x value, if no ball, we'll catch the error and return -1 as error
+        try {
             return(blocks.get(0).getX());
         }
         catch (Exception e) {
-            return(-1);
+            return(-1); //ArrayList is empty, and there are no valid targets
         }
         
     }
-    
-    public int getPixyY() { //same procedure as getPixyX, just with the y value
+
+    /**
+     * Uses the Pixy2 API to request and return the Y-position of the first PixyCam target
+     * @return Y-Position (in pixels from the top of the image) of the first Pixy target
+     */
+    public int getPixyY() {
         if (!isCamera){
             state = pixycam.init();
+            isCamera = state >= 0;
         }
 
-        isCamera = state >= 0;
         pixycam.getCCC().getBlocks(false);
         ArrayList<Block> blocks= pixycam.getCCC().getBlockCache();
         
@@ -93,7 +101,7 @@ public class FixedPixyCamVision {
             return(blocks.get(0).getY());
         }
         catch (Exception e) {
-            return(-1);
+            return(-1); //ArrayList is empty, and there are no valid targets
         }
         
     }
