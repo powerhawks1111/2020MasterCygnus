@@ -117,8 +117,6 @@ public class PixyCamOperate {
      * @return
      */
     public boolean searchForBalls() {
-        int minWidth = 50; // TODO: Change this to the correct minimum number of pixels wide the nearest
-                           // ball should be
         int marginOfError = 15; // TODO: Change this to the correct +/- margin of error that the ball can be off
                                 // of center
         int currXPosition;
