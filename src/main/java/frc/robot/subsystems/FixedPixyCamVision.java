@@ -3,27 +3,10 @@
  */
 package frc.robot.subsystems;
 
-//import edu.wpi.first.wpilibj.I2C;
-//import edu.wpi.first.wpilibj.I2C.Port;
-//import edu.wpi.first.wpilibj.TimedRobot;
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-//import edu.wpi.first.wpilibj.IterativeRobot;
-
-//import vars.Motors;
-
-//import edu.wpi.first.wpilibj.SerialPort;
-
-//import com.ctre.phoenix.motorcontrol.ControlMode;
-
-//import java.nio.ByteBuffer;
-//import java.nio.ByteOrder;
-
 import java.util.ArrayList;
 import  frc.robot.subsystems.pixy2api.*;
-//import frc.robot.subsystems.pixy2api.Pixy2;
+import frc.robot.subsystems.pixy2api.Pixy2;
 import  frc.robot.subsystems.pixy2api.Pixy2CCC.Block;
-//import edu.wpi.first.wpilibj.SerialPort;
 import frc.robot.variables.Objects;
 
 public class FixedPixyCamVision {
