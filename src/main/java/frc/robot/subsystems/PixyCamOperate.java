@@ -1,24 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.variables.Objects;
-import java.util.concurrent.TimeUnit;
 public class PixyCamOperate {
-
-    /**
-     * Prints out values from the pixycam to test the connection.
-     */
-     public void pixyCamValuesPrintout() {
-        Objects.pixyCamVision.updatePixyCamData();
-
-        System.out.println("PixyCam Values: ");
-        System.out.println("Sig: " + Objects.pixyCamVision.getSig());
-        System.out.println("X-Position: " + Objects.pixyCamVision.getX());
-        System.out.println("Y-Position: " + Objects.pixyCamVision.getY());
-        System.out.println("Width: " + Objects.pixyCamVision.getWidth());
-        System.out.println("Height: " + Objects.pixyCamVision.getHeight());
-
-        System.out.println("\n\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n");
-    }
 
     /**
      * Takes the position of the target that the PixyCam has selected, begins turning towards that target, and returns the current X position
@@ -35,53 +18,60 @@ public class PixyCamOperate {
         }
         return X_Position;
     }
-    public String lineUp(){
-        int x = Objects.fixedPixyCamVision.getPixyX();
+
+    public void getBall(){ //GETS THE BALL
+        String command= lineUp(); //determines status of robot
+        if (command!="Obey Driver"){  //If robot doesn't have to obey driver
+            if (lineUp()=="Straight"&&closeY()=="Able"){ //do if close to intake and straight ahead
+                Objects.driveTrain.tankDrive(.2, .2);
+                System.out.println("GET IT!");
+            } else if (lineUp()=="Straight"){ //do if not close to intake but straight ahead
+                Objects.driveTrain.tankDrive(.15, .15);
+                System.out.println("STRAIGHT!");
+            }
+            else if (lineUp()=="Right"){ //do if ball to the right
+                Objects.driveTrain.tankDrive(.2, .15);
+                System.out.println("RIGHT!");
+
+            }else if (lineUp()=="Left"){ //do if ball is to the left
+                Objects.driveTrain.tankDrive(.15, .2);
+                System.out.println("LEFT!");
+            }
+        }
+    }
+
+    public String lineUp(){ //determines status of ball relative to robot
+        int x = Objects.fixedPixyCamVision.smoothX();
         //center of intake 170
-        if (x!=-1)  {
-            if (x>190){
+        if (x!=-1)  { //if no error
+            if (x>190){ //if to right, deadzone 20 on each side of robot
                 return("Right");
             } else if (x<150){
-                return("Left");
+                return("Left"); //if to the left
             }else {
-                return("Straight");
+                return("Straight"); //If in deadzone, ball is straight ahead
             }
         } 
         else{
         return("Obey Driver");
         } 
     }
-    public String getY(){
-        int y= Objects.fixedPixyCamVision.getPixyY();
-        if (y>100){
-            return ("Able");
-            
-        } else {
-            return ("Unable");
-        }
-    }
-    public void getBall(){
-        String command= lineUp();
-        if (command!="Obey Driver"){
-            if (lineUp()=="Straight"&&getY()=="Able"){
-                Objects.driveTrain.tankDrive(.2, .2);
-                System.out.println("GET IT!");
-            } else if (lineUp()=="Straight"){
-                Objects.driveTrain.tankDrive(.15, .15);
-                System.out.println("STRAIGHT!");
-            }
-            else if (lineUp()=="Right"){
-                Objects.driveTrain.arcadeDrive(.2, .15);
-                System.out.println("RIGHT!");
-
-            }else if (lineUp()=="Left"){
-                Objects.driveTrain.tankDrive(.15, .2);
-                System.out.println("LEFT!");
-            }
-        }
-        
     
+    public String closeY(){
+        int y= Objects.fixedPixyCamVision.smoothY(); //
+        if (y!=-1){ //If no error
+            if (y>100){ //If close the intake (Value may change)
+                return ("Able");
+            
+            } else {
+                return ("Unable");
+            } 
+        }else { //In event of error, so no ball found
+            return ("No Ball Found"); }
+
     }
+    
+    
     
     /**
      * Rotates the robot until it finds a ball, then precisely rotates so the ball is in the center of the field of view.
