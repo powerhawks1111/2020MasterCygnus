@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import  frc.robot.subsystems.pixy2api.*;
 import frc.robot.subsystems.pixy2api.Pixy2;
 import  frc.robot.subsystems.pixy2api.Pixy2CCC.Block;
-import frc.robot.variables.Objects;
+import frc.robot.variables.Objects;;
 
 public class FixedPixyCamVision {
     public Pixy2 pixycam = Pixy2.createInstance(Pixy2.LinkType.I2C);
@@ -40,7 +40,17 @@ public class FixedPixyCamVision {
             return -1;
         }
     }
-
+    /**
+     * Turns on/off camera LEDs to show ball detected, as well as shows smoothed out x value for testing
+     */
+    public void statusUpdate(){
+        if (getPixyX() != -1) {
+            Objects.visionSystems.turnLightOn();
+        } else {
+            Objects.visionSystems.turnLightOff();
+        }
+        System.out.println(smoothX());
+    }
     /**
      * Returns the average value of 10 PixyCam readings in order to smooth out the Y value
      * @return Average value of 10 pixycam readings

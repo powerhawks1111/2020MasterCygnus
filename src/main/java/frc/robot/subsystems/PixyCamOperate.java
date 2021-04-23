@@ -5,7 +5,9 @@ import frc.robot.variables.Objects;
 public class PixyCamOperate {
     Boolean gotBall = false;
     Boolean broken = false; // determines if ball goes outside range
-
+    /**
+     * Tries to get the ball until the ball is detected in the intake.
+     */
     public void fullBallFind() {
         if (!gotBall) {
             getBall();
@@ -30,7 +32,15 @@ public class PixyCamOperate {
         }
         return X_Position;
     }
-
+    /**
+     * The entire find loop to get the ball. Gets position in the x direction, and proximity to intake, and acts accordingly. 
+     * <li>LOGIC:</li>
+     * <ul> 
+     * <li>If close to the intake and off center, the robot pivots around its vertical axis.</li> 
+     * <li>If ball is close and straight ahead, the robot operates the intake until the index detects the ball or the ball moves out of the correct position</li>
+     * <li>If the ball is to the right/left, the robot uses arcade drive to drive right/left.</li> 
+     * <li>If straight ahead but not in range, the robot drives forward. </li>
+     */
     public void getBall() { // GETS THE BALL
         String command = lineUp(); // determines status of robot
         String yCommand = closeY();
@@ -43,8 +53,10 @@ public class PixyCamOperate {
                     if (closeY() == "Unable" || lineUp() != "Straight") { // if ball moves out of position
                         Objects.intake.intake(-1);
                         broken = true;
+                        System.out.println("Out of Range");
                         break;
                     }
+                    System.out.println("Intake Down");
                     Objects.intake.intake(0); //activate intake
                 }
                 if (broken == false) { //if we got the ball
@@ -78,7 +90,11 @@ public class PixyCamOperate {
             System.out.println("No Ball Found");
         }
     }
-
+    /**
+     * Determines the relative position of the ball to the robot. 
+     * Uses only the x value, and has a deadzone 40 pixels wide in the center
+     * @return string of the position of the ball: Right, Left, Straight, or Obey Driver (no ball)
+     */
     public String lineUp() { // determines status of ball relative to robot
         int x = Objects.fixedPixyCamVision.smoothX();
         // center of intake 170
@@ -94,7 +110,11 @@ public class PixyCamOperate {
             return ("Obey Driver");
         }
     }
-
+    /**
+     * Takes into account y value of ball and determines if it is close enough to intake. 
+     * The logic is when the ball is below a certain part of the frame.
+     * @return String statement of the ability of the robot: Able, Unable, No Ball Found
+     */
     public String closeY() {
         int y = Objects.fixedPixyCamVision.smoothY(); //
         if (y != -1) { // If no error
@@ -107,7 +127,6 @@ public class PixyCamOperate {
         } else { // In event of error, so no ball found
             return ("No Ball Found");
         }
-
     }
 
     /**
@@ -120,6 +139,7 @@ public class PixyCamOperate {
         int marginOfError = 15; // TODO: Change this to the correct +/- margin of error that the ball can be off
                                 // of center
         int currXPosition;
+        int minWidth=0;//TODO Rex- I intialized it only because the the variables below were causing errors. Nathan - 4/23
         boolean hasLinedUp = false;
         Objects.pixyCamVision.updatePixyCamData();
         if (Objects.pixyCamVision.getWidth() < minWidth) { // if there are no valid targets, continue rotating
