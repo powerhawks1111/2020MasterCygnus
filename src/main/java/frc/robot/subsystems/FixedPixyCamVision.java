@@ -24,6 +24,7 @@ import  frc.robot.subsystems.pixy2api.*;
 //import frc.robot.subsystems.pixy2api.Pixy2;
 import  frc.robot.subsystems.pixy2api.Pixy2CCC.Block;
 //import edu.wpi.first.wpilibj.SerialPort;
+import frc.robot.variables.Objects;
 
 public class FixedPixyCamVision {
     public Pixy2 pixycam = Pixy2.createInstance(Pixy2.LinkType.I2C);//initializes pixy2 as I2c port
@@ -41,14 +42,17 @@ public class FixedPixyCamVision {
         int numReadings = 10; //average of 10 readings
 
         if (getPixyX() != -1) { //if no error
+            Objects.visionSystems.turnLightOn();
             for (i = 0; i < numReadings; i++) {
                 value = value + getPixyX(); //get sum of values
             }
             value = value / numReadings; //what will happen here? We could get a decimal
+            System.out.println(value);
             return((int)value);
         }
 
         else {
+            Objects.visionSystems.turnLightOff();
             return -1; //continues returning error
         }
     }
@@ -59,6 +63,7 @@ public class FixedPixyCamVision {
         int numReadings=10; //average of 10 readings
 
         if (getPixyX() != -1) { //if no error
+            Objects.visionSystems.turnLightOn();
             for (i = 0; i < numReadings; i++) {
                 value = value + getPixyY(); //get sum of values
             }
@@ -67,7 +72,8 @@ public class FixedPixyCamVision {
         }
 
         else {
-            return -1; //continues returning error
+            Objects.visionSystems.turnLightOn();
+            return -1; // continues returning error
         }
     }
 
