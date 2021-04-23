@@ -13,7 +13,7 @@ public class Driver {
         arcadeDrive();
         // cubeDrive();
         // autonomousShoot();
-        activeClimb();
+        //activeClimb();
         autonomousLineUp();
         turnLightsOff();
         pixyCamAutonomousTest();
@@ -86,7 +86,7 @@ public class Driver {
 
     public void pixyCamAutonomousTest() {
         if (Objects.driverJoy.getRawButton(ControllerMap.Y_BUTTON)) {
-            Objects.pixyCamOperate.getBall();
+            Objects.pixyCamOperate.fullBallFind();
         }
     }
 }
