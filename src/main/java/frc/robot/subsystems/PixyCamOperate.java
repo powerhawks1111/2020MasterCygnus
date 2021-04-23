@@ -148,8 +148,7 @@ public class PixyCamOperate {
      * power. When it gets close enough to the ball, it switches to intaking and
      * moving a specific distance.
      * 
-     * @return ballPickedUp - whether or not the robot has made an attempt at
-     *         intaking a ball
+     * @return ballPickedUp - whether or not the robot has made an attempt at intaking a ball
      */
     public boolean driveToBall() {
         int minY = 160;
