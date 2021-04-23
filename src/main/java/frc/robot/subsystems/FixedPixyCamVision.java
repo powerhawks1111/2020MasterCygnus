@@ -10,53 +10,55 @@ import  frc.robot.subsystems.pixy2api.Pixy2CCC.Block;
 import frc.robot.variables.Objects;
 
 public class FixedPixyCamVision {
-    public Pixy2 pixycam = Pixy2.createInstance(Pixy2.LinkType.I2C);//initializes pixy2 as I2c port
-    boolean isCamera = false; //camera isn't there, sets up if statement to initialize
-    int state =-1; //changed in if statement
-    int n=0;
+    public Pixy2 pixycam = Pixy2.createInstance(Pixy2.LinkType.I2C);
+    boolean isCamera = false; //Camera initialization status
+    int state =-1; //error state of the PixyCam initialization
+    int n = 0;
 
     public FixedPixyCamVision() {
         // constructor
     }
 
-    public int smoothX() {//SMOOTHS OUT CHAOTIC READINGS
+    /**
+     * Returns the average value of 10 PixyCam readings in order to smooth out the X value
+     * @return Average value of 10 pixycam readings
+     */
+    public int smoothX() {
         int i;
         double value = 0;
-        int numReadings = 10; //average of 10 readings
+        int numReadings = 10;
 
         if (getPixyX() != -1) { //if no error
-            Objects.visionSystems.turnLightOn();
             for (i = 0; i < numReadings; i++) {
-                value = value + getPixyX(); //get sum of values
+                value = value + getPixyX();
             }
-            value = value / numReadings; //what will happen here? We could get a decimal
+            value = value / numReadings;
             System.out.println(value);
             return((int)value);
         }
-
         else {
-            Objects.visionSystems.turnLightOff();
-            return -1; //continues returning error
+            return -1;
         }
     }
 
-    public int smoothY() {//same thing as smoothX
+    /**
+     * Returns the average value of 10 PixyCam readings in order to smooth out the Y value
+     * @return Average value of 10 pixycam readings
+     */
+    public int smoothY() {
         int i;
-        double value=0;
-        int numReadings=10; //average of 10 readings
+        double value = 0;
+        int numReadings = 10;
 
-        if (getPixyX() != -1) { //if no error
-            Objects.visionSystems.turnLightOn();
+        if (getPixyX() != -1) {
             for (i = 0; i < numReadings; i++) {
-                value = value + getPixyY(); //get sum of values
+                value = value + getPixyY();
             }
-            value = value / numReadings; //what will happen here? We could get a decimal
+            value = value / numReadings;
             return((int)value);
         }
-
         else {
-            Objects.visionSystems.turnLightOn();
-            return -1; // continues returning error
+            return -1;
         }
     }
 
