@@ -4,7 +4,7 @@ import frc.robot.variables.Objects;
 
 public class PixyCamOperate {
     Boolean gotBall = false;
-    Boolean broken = false; // determines manual override
+    Boolean broken = false; // determines if ball goes outside range
 
     public void fullBallFind() {
         if (!gotBall) {
