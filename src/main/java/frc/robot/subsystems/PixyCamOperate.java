@@ -154,22 +154,20 @@ public class PixyCamOperate {
      *         intaking a ball
      */
     public boolean driveToBall() {
-        int maxWidth = 75; // TODO: Change this to the correct maximum number of pixels wide a ball will be
-                           // when it is in front of the intake
-        int minY = 50; // TODO: Change this to the correct minimum height that the ball will be before
-                       // the intake should be activated
+        int minY = 160;
         boolean ballPickedUp = false;
-        double drivingSpeed = 0.1; // TODO: Perentage of power that the robot should drive towards the ball with,
-                                   // might need to be negative because intake is on the "back"
+        double drivingSpeed = 0.1;
         Objects.pixyCamVision.updatePixyCamData();
-        if (searchForBalls() == true && Objects.pixyCamVision.getWidth() < maxWidth) {
+
+        if (searchForBalls() == true && Objects.pixyCamVision.getY() > minY) {
             System.out.println("Driving towards ball.");
             Objects.driveTrain.arcadeDrive(drivingSpeed, 0);
             pixyLineUp();
-        } else if (Objects.pixyCamVision.getWidth() >= maxWidth || Objects.pixyCamVision.getY() <= minY) {
+        }
+        else {
             Objects.intake.intake(0);
             Objects.index.intakeIndex();
-            Objects.driveTrain.moveDistance(30, 0.05, true);
+            Objects.driveTrain.moveDistance(30, 0.1, true); //TODO: Determine drive distance
             ballPickedUp = true;
         }
         return ballPickedUp;
@@ -180,9 +178,9 @@ public class PixyCamOperate {
      * drives to each ball to pick it up
      * 
      * @param numBallsToFind
-     *                       <ul>
-     *                       <li>How many balls to search for and pick up</li>
-     *                       </ul>
+     * <ul>
+     * <li>How many balls to search for and pick up</li>
+     * </ul>
      */
     public void fullPixyCamSequence(int numBallsToFind) {
         if (Objects.magicNumbers.numBallsPickedUp <= numBallsToFind && !Objects.magicNumbers.successfulCompletion) {
