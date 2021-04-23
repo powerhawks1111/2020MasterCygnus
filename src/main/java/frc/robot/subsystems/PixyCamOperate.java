@@ -21,11 +21,11 @@ public class PixyCamOperate {
     public int pixyLineUp() {
         Objects.pixyCamVision.updatePixyCamData();
         int X_Position = Objects.pixyCamVision.getX();
-        if (X_Position < 5 && X_Position > -5) { // TODO change the margin of error
-            Objects.driveTrain.tankDrive(Objects.pixyCamVision.pixyCamSpeedLeft(X_Position),
-                    Objects.pixyCamVision.pixyCamSpeedRight(X_Position)); // TODO: Might need to be negative values
-                                                                          // because intake is on the back
-        } else {
+        int center = 168; //center of image is 168 pixels from the left side of the frame
+        if (X_Position < (center - 20) || X_Position > (center + 20)) {
+            Objects.driveTrain.tankDrive(Objects.pixyCamVision.pixyCamSpeedLeft(X_Position), Objects.pixyCamVision.pixyCamSpeedRight(X_Position));
+        }
+        else {
             Objects.driveTrain.tankDrive(0, 0);
         }
         return X_Position;
@@ -35,7 +35,6 @@ public class PixyCamOperate {
         String command = lineUp(); // determines status of robot
         String yCommand = closeY();
         if (command != "Obey Driver" && yCommand != "No Ball Found") { // If robot doesn't have to obey driver and ball is found
-                                                                        
             if (command == "Straight" && yCommand == "Able") { // do if close to intake and straight ahead
                 broken = false; //ball is still in range
                 System.out.println("GET IT!");
@@ -52,24 +51,30 @@ public class PixyCamOperate {
                     gotBall = true;
                 }
             //repeats until it finds the ball in the right position again
-            } else if (command == "Right" && yCommand == "Able") { // just orient right if ball is close and to the
-                                                                   // right
+            }
+            else if (command == "Right" && yCommand == "Able") { // just orient right if ball is close and to the right
                 Objects.driveTrain.tankDrive(.1, -.1);
                 System.out.println("ORIENTING RIGHT");
-            } else if (command == "Left" && yCommand == "Able") {// opposite of else if above
+            }
+            else if (command == "Left" && yCommand == "Able") {// opposite of else if above
                 Objects.driveTrain.tankDrive(-.1, .1);
                 System.out.println("ORIENTING LEFT");
-            } else if (lineUp() == "Straight") { // do if not close to intake but straight ahead
+            }
+            else if (lineUp() == "Straight") { // do if not close to intake but straight ahead
                 Objects.driveTrain.arcadeDrive(.15, 0);
                 System.out.println("STRAIGHT!");
-            } else if (lineUp() == "Right") { // do if ball to the right
+            }
+            else if (lineUp() == "Right") { // do if ball to the right
                 Objects.driveTrain.arcadeDrive(.15, .15);
                 System.out.println("RIGHT!");
-            } else if (lineUp() == "Left") { // do if ball is to the left
+            }
+            else if (lineUp() == "Left") { // do if ball is to the left
                 Objects.driveTrain.arcadeDrive(.15, -.15);
                 System.out.println("LEFT!");
             }
-        } else {
+        }
+        
+    else {
             System.out.println("No Ball Found");
         }
     }
@@ -149,22 +154,20 @@ public class PixyCamOperate {
      *         intaking a ball
      */
     public boolean driveToBall() {
-        int maxWidth = 75; // TODO: Change this to the correct maximum number of pixels wide a ball will be
-                           // when it is in front of the intake
-        int minY = 50; // TODO: Change this to the correct minimum height that the ball will be before
-                       // the intake should be activated
+        int minY = 160;
         boolean ballPickedUp = false;
-        double drivingSpeed = 0.1; // TODO: Perentage of power that the robot should drive towards the ball with,
-                                   // might need to be negative because intake is on the "back"
+        double drivingSpeed = 0.1;
         Objects.pixyCamVision.updatePixyCamData();
-        if (searchForBalls() == true && Objects.pixyCamVision.getWidth() < maxWidth) {
+
+        if (searchForBalls() == true && Objects.pixyCamVision.getY() > minY) {
             System.out.println("Driving towards ball.");
             Objects.driveTrain.arcadeDrive(drivingSpeed, 0);
             pixyLineUp();
-        } else if (Objects.pixyCamVision.getWidth() >= maxWidth || Objects.pixyCamVision.getY() <= minY) {
+        }
+        else {
             Objects.intake.intake(0);
             Objects.index.intakeIndex();
-            Objects.driveTrain.moveDistance(30, 0.05, true);
+            Objects.driveTrain.moveDistance(30, 0.1, true); //TODO: Determine drive distance
             ballPickedUp = true;
         }
         return ballPickedUp;
@@ -175,9 +178,9 @@ public class PixyCamOperate {
      * drives to each ball to pick it up
      * 
      * @param numBallsToFind
-     *                       <ul>
-     *                       <li>How many balls to search for and pick up</li>
-     *                       </ul>
+     * <ul>
+     * <li>How many balls to search for and pick up</li>
+     * </ul>
      */
     public void fullPixyCamSequence(int numBallsToFind) {
         if (Objects.magicNumbers.numBallsPickedUp <= numBallsToFind && !Objects.magicNumbers.successfulCompletion) {
