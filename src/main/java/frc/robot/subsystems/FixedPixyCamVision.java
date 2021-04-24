@@ -28,7 +28,7 @@ public class FixedPixyCamVision {
         double value = 0;
         int numReadings = 10;
 
-        if (getPixyX() != -1) { //if no error
+        if (getPixyX() != -1) {
             for (i = 0; i < numReadings; i++) {
                 value = value + getPixyX();
             }
