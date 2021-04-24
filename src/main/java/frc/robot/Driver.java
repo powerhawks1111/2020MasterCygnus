@@ -88,7 +88,7 @@ public class Driver {
         if (Objects.driverJoy.getRawButton(ControllerMap.Y_BUTTON)) {
             Objects.pixyCamOperate.fullBallFind();
         } else {
-            Objects.fixedPixyCamVision.smoothX(); //lights up robot
+            Objects.fixedPixyCamVision.statusUpdate();
         }
     }
 }
