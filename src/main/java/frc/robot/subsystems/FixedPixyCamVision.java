@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import  frc.robot.subsystems.pixy2api.*;
 import frc.robot.subsystems.pixy2api.Pixy2;
 import  frc.robot.subsystems.pixy2api.Pixy2CCC.Block;
-import frc.robot.variables.Objects;;
+import frc.robot.variables.Objects;
 
 public class FixedPixyCamVision {
     public Pixy2 pixycam = Pixy2.createInstance(Pixy2.LinkType.I2C);
