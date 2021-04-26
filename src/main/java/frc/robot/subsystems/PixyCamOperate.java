@@ -96,7 +96,7 @@ public class PixyCamOperate {
      * @return string of the position of the ball: Right, Left, Straight, or Obey Driver (no ball)
      */
     public String lineUp() { // determines status of ball relative to robot
-        int x = Objects.fixedPixyCamVision.smoothX();
+        int x = Objects.fixedPixyCamVision.getPixyX();
         // center of intake 170
         if (x != -1) { // if no error
             if (x > 190) { // if to right, deadzone 20 on each side of robot
@@ -116,7 +116,7 @@ public class PixyCamOperate {
      * @return String statement of the ability of the robot: Able, Unable, No Ball Found
      */
     public String closeY() {
-        int y = Objects.fixedPixyCamVision.smoothY(); //
+        int y = Objects.fixedPixyCamVision.getPixyY(); //
         if (y != -1) { // If no error
             if (y > 100) { // If close the intake (Value may change)
                 return ("Able");
