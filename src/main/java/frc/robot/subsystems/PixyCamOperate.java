@@ -72,15 +72,15 @@ public class PixyCamOperate {
                 Objects.driveTrain.tankDrive(-.1, .1);
                 System.out.println("ORIENTING LEFT");
             }
-            else if (lineUp() == "Straight") { // do if not close to intake but straight ahead
+            else if (command == "Straight") { // do if not close to intake but straight ahead
                 Objects.driveTrain.arcadeDrive(.15, 0);
                 System.out.println("STRAIGHT!");
             }
-            else if (lineUp() == "Right") { // do if ball to the right
+            else if (command == "Right") { // do if ball to the right
                 Objects.driveTrain.arcadeDrive(.15, .15);
                 System.out.println("RIGHT!");
             }
-            else if (lineUp() == "Left") { // do if ball is to the left
+            else if (command == "Left") { // do if ball is to the left
                 Objects.driveTrain.arcadeDrive(.15, -.15);
                 System.out.println("LEFT!");
             }

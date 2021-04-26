@@ -83,7 +83,12 @@ public class FixedPixyCamVision {
         } else {
             Objects.visionSystems.turnLightOff();
         }
-        System.out.println(trackBall());
+        try {
+            System.out.println(trackBall());
+        } 
+        catch (Exception e) {
+            System.out.println("No Balls Found");
+        }
     }
 
     /**
@@ -110,7 +115,7 @@ public class FixedPixyCamVision {
 
     /**
      * Uses the Pixy2 API to request and return the X-position of the first PixyCam
-     * target
+     * target. The first object in the array has the largest area.
      * 
      * @return X-Position (in pixels from the left of the image) of the first Pixy
      *         target
@@ -133,7 +138,7 @@ public class FixedPixyCamVision {
 
     /**
      * Uses the Pixy2 API to request and return the Y-position of the first PixyCam
-     * target
+     * target. The largest object in the array has the largest area.
      * 
      * @return Y-Position (in pixels from the top of the image) of the first Pixy
      *         target
