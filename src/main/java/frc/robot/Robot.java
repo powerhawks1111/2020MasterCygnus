@@ -110,34 +110,37 @@ public class Robot extends TimedRobot {
     }
 
     public void autonomousPeriodic() {
-        switch (autoSelected) {
-        case kAuto1:
-            autonomous.redPath();
-            break;
-        case kAuto2:
-            autonomous.orangePath();
-            break;
-        case kAuto3:
-            autonomous.yellowPath();
-            break;
-        case kAuto4:
-            autonomous.greenPath();
-            break;
-        case kAuto5:
-            autonomous.bluePath();
-            break;
-        case kAuto6:
-            autonomous.indigoPath();
-            break;
-        case kAuto7:
-            autonomous.violetPath();
-            break;
-        case kDefaultAuto:
-        default:
-            autonomous.defaultAutonomous();
-            break;
-        }
+        autonomous.moveDistanceTest(); //commented out code to test distance functionss
+        // switch (autoSelected) {
+        // case kAuto1:
+        //     autonomous.redPath();
+        //     break;
+        // case kAuto2:
+        //     autonomous.orangePath();
+        //     break;
+        // case kAuto3:
+        //     autonomous.yellowPath();
+        //     break;
+        // case kAuto4:
+        //     autonomous.greenPath();
+        //     break;
+        // case kAuto5:
+        //     autonomous.bluePath();
+        //     break;
+        // case kAuto6:
+        //     autonomous.indigoPath();
+        //     break;
+        // case kAuto7:
+        //     autonomous.violetPath();
+        //     break;
+        // case kDefaultAuto:
+        // default:
+        //     autonomous.defaultAutonomous();
+        //     break;
+        // }
     }
+
+    
 
     public void teleopPeriodic() {
         driver.drive();

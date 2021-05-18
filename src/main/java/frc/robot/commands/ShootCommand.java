@@ -9,7 +9,7 @@ public class ShootCommand implements Command {
 
     int velocity; //flywheel velocity
     Timer timer = new Timer();
-    boolean lineup; //TODO: what is this?
+    boolean lineup; //whether or not the robot is currently lining up
 
     /**
      * Default autonomous shoot command constructor that accepts a given flywheel rpm
@@ -28,7 +28,7 @@ public class ShootCommand implements Command {
     }
 
     /**
-     * Overloaded sutonomous shoot command
+     * Overloaded autonomous shoot command
      * <br><br>
      * Automatically calculates the flywheel velocity based on the width of the target
      * @param l

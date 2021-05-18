@@ -3,108 +3,158 @@
  */
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.I2C.Port;
-//import edu.wpi.first.wpilibj.IterativeRobot;
+import java.util.ArrayList;
 
-//import vars.Motors;
-
-//import edu.wpi.first.wpilibj.SerialPort;
-
-//import com.ctre.phoenix.motorcontrol.ControlMode;
-
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-//import edu.wpi.first.wpilibj.SerialPort;
+import frc.robot.subsystems.pixy2api.Pixy2;
+import frc.robot.subsystems.pixy2api.Pixy2CCC.Block;
+import frc.robot.variables.Objects;
 
 public class PixyCamVision {
-
-    I2C PixyCamI2C = new I2C(Port.kOnboard, 0x69);
-
-    int temp;
-    int i;
-    private int checkSum;
-    private int sig;
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    public Pixy2 pixycam = Pixy2.createInstance(Pixy2.LinkType.I2C);
+    boolean isCamera = false; // Camera initialization status
+    int state = -1; // error state of the PixyCam initialization
+    int n = 0;
+    int index = -1;
 
     public PixyCamVision() {
         // constructor
     }
-
     /**
-     * TODO: Rewrite this so it is all one line and not multiple nested IF
-     * statements It works right now so I won't touch it till I can test it, but it
-     * needs to get fixed Date: 3/30/2021 -Rex McAllister
+     * Method used to get the index of a certain object without errors
+     * @param Position array position you want to find
+     * @return index of position
      */
-    private void updateData() {
-        if (readByte() == 85) { // 85 = 01010101 = 55
-            if (readByte() == -86) { // -86 = 10101010 = AA
-                if (readByte() == 85) { // The I2C stream will send these expected test bits to make sure the conenction is good
-                    if (readByte() == -86) {
-                        checkSum = readShort();
-                        sig = readShort();
-                        x = readShort();
-                        y = readShort();
-                        width = readShort();
-                        height = readShort();
+    public int getIndex (int Position) {
+        if (!isCamera) { // initializes if not initialized
+            state = pixycam.init();
+            isCamera = state >= 0;
+        }
+        pixycam.getCCC().getBlocks(false);
+        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
 
-                    }
+        try {
+            return (blocks.get(Position).getIndex());
+        } catch (Exception e) {
+            return (-1); // ArrayList is empty, and there are no valid targets
+        }
+    }
+    /**
+     * Returns the x position of a tracked ball (it tracks the index). If the ball
+     * is lost, it tracks the next biggest ball
+     * 
+     * @return X position of indexed (tracked ball)
+     */
+    public int trackBall() {
+        pixycam.getCCC().getBlocks(false);
+        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
+        Boolean found = false;
+        if (index != getIndex(0)) { // if index isn't the same as first block in list
+            for (int i = 0; i < blocks.size(); i++) { // find the index
+                if (index == getIndex(i)) {
+                    found = true;
+                    return (getPixyX(i));
                 }
             }
+            if (!found) { // find the next biggest object
+                index = getIndex(0);
+                return (getPixyX(0));
+            }
+        } 
+        else { // returns already tracked object
+            return (getPixyX(0));
+        }
+        System.out.println("Something went wrong tracking the index");
+        return (getPixyX(0)); // idk why but VS code made me put this here
+
+    }
+
+    /**
+     * Turns on/off camera LEDs to show ball detected, as well as shows smoothed out
+     * x value for testing
+     */
+    public void statusUpdate() {
+        if (getPixyX(0) != -1) {
+            Objects.visionSystems.turnLightOn();
         } else {
-            x = 0;
+            Objects.visionSystems.turnLightOff();
         }
     }
 
-    private byte readByte() {
-        ByteBuffer buffer = ByteBuffer.allocateDirect(1);
-        PixyCamI2C.readOnly(buffer, 1);
-        byte myByte = buffer.get();
-        return myByte;
-    }
-
-    private short readShort() {
-        ByteBuffer buffer = ByteBuffer.allocateDirect(2);
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
-        PixyCamI2C.readOnly(buffer, 2);
-        short myShort = buffer.getShort();
-        return myShort;
-    }
-
-    public int getCheckSum() {
-        return checkSum;
-    }
-
-    public int getSig() {
-        return sig;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void updatePixyCamData() {
+    /**
+     * Returns the first instance of a pixyCam target that is roughly a square, like a ball.
+     * This should help filter out any objects that are yellow but not a ball.
+     * @return integer i, the index of the first square pixyCam target, or -1 if there are no targets.
+     */
+    public int firstValidIndex() {
+        if (!isCamera) { // initializes if not initialized
+            state = pixycam.init();
+            isCamera = state >= 0;
+        }
+        pixycam.getCCC().getBlocks(false);
+        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
         try {
-            updateData();
-        } catch (Exception e) {
-            System.out.println("PixyCam had an error! Line 106 of PixyCamVision.java!");
+            for (int i = 0; i < blocks.size(); i++) {
+                int X_Position = blocks.get(i).getX();
+                int Y_Position = blocks.get(i).getY();
+                boolean isASquare = (Y_Position >= X_Position - 5) || (Y_Position <= X_Position + 5);
+                if (isASquare) {
+                    return i;
+                }
+            }
         }
+
+        catch(Exception e) {
+            return -1;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Uses the Pixy2 API to request and return the X-position of the first PixyCam
+     * target. The first object in the array has the largest area.
+     * @param Position - the index of the object in the array you want to get X for
+     * @return X-Position (in pixels from the left of the image) of the first Pixy
+     *         target (-1 if there are no targets to track)
+     */
+    public int getPixyX(int Position) {
+        if (!isCamera) { // initializes if not initialized
+            state = pixycam.init();
+            isCamera = state >= 0;
+        }
+        pixycam.getCCC().getBlocks(false);
+        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
+
+        try {
+            return (blocks.get(Position).getX());
+        } catch (Exception e) {
+            return (-1); // ArrayList is empty, and there are no valid targets
+        }
+
+    }
+
+    /**
+     * Uses the Pixy2 API to request and return the Y-position of the first PixyCam
+     * target. The largest object in the array has the largest area.
+     * @param Position - the index of the object in the array you want to get Y for
+     * @return Y-Position (in pixels from the top of the image) of the first Pixy
+     *         target (-1 if there are no targets to track)
+     */
+    public int getPixyY(int Position) {
+        if (!isCamera) {
+            state = pixycam.init();
+            isCamera = state >= 0;
+        }
+
+        pixycam.getCCC().getBlocks(false);
+        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
+
+        try {
+            return (blocks.get(Position).getY());
+        } catch (Exception e) {
+            return (-1); // ArrayList is empty, and there are no valid targets
+        } 
+
     }
 
     /**
@@ -138,20 +188,4 @@ public class PixyCamVision {
         return calculatedSpeedPercentage;
     }
 
-    // spins in place so target is in center
-    // TODO: Not sure if this works, 3/30/2021
-    public double spinUp() {
-        double speed = 0;
-        updateData();
-        int x = getX();
-        // double speed = -0.4;
-        if (x > 0) {
-            // matrix.defaultMatrix = false;
-            // matrix.fillColor(0, 255, 0);
-            double value = (-0.00625 * x) + 1;
-            // dt.tankDrive(value * -speed, value * speed);
-            speed = value;
-        }
-        return speed;
-    }
 }

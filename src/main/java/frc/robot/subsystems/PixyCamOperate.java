@@ -1,211 +1,175 @@
 package frc.robot.subsystems;
 
 import frc.robot.variables.Objects;
+import java.lang.Math;
 
 public class PixyCamOperate {
-    Boolean gotBall = false;
-    Boolean broken = false; // determines if ball goes outside range
+    public boolean lineup = false;
+    public boolean intakeDown = false;
+    public boolean waiting = false;
+    public int ballsRetrieved = 0;
+    public boolean gotBall = true;
+    public boolean waitingIntake = false;
     /**
-     * Tries to get the ball until the ball is detected in the intake.
-     */
-    public void fullBallFind() {
-        if (!gotBall) {
-            getBall();
-        }
-    }
-    // TODO: https://www.desmos.com/calculator/zgfwpnir32
-    /**
-     * Takes the position of the target that the PixyCam has selected, begins
-     * turning towards that target, and returns the current X position
-     * 
-     * @return X_Position
+     * Rotates the robot in place to track the ball
+     * <br><br>
+     * Rotation equation: https://www.desmos.com/calculator/zgfwpnir32
+     * @return X_Position from the pixyCam target
      */
     public int pixyLineUp() {
-        Objects.pixyCamVision.updatePixyCamData();
-        int X_Position = Objects.pixyCamVision.getX();
-        int center = 168; //center of image is 168 pixels from the left side of the frame
-        if (X_Position < (center - 20) || X_Position > (center + 20)) {
-            Objects.driveTrain.tankDrive(Objects.pixyCamVision.pixyCamSpeedLeft(X_Position), Objects.pixyCamVision.pixyCamSpeedRight(X_Position));
+        int X_Position = Objects.pixyCamVision.getPixyX(0);
+        int center = 166;
+        double scaledPower = 0.3;
+        double equationPower = 13 / 9; // power for the calculated speed equation
+        double calculatedSpeed = scaledPower * (1 / Math.pow(center, equationPower)) * (Math.pow((X_Position - center), equationPower));
+
+        if (X_Position != -1) {
+            Objects.driveTrain.tankDrive(-calculatedSpeed, calculatedSpeed);
         }
+
         else {
             Objects.driveTrain.tankDrive(0, 0);
         }
         return X_Position;
     }
-    /**
-     * The entire find loop to get the ball. Gets position in the x direction, and proximity to intake, and acts accordingly. 
-     * <li>LOGIC:</li>
-     * <ul> 
-     * <li>If close to the intake and off center, the robot pivots around its vertical axis.</li> 
-     * <li>If ball is close and straight ahead, the robot operates the intake until the index detects the ball or the ball moves out of the correct position</li>
-     * <li>If the ball is to the right/left, the robot uses arcade drive to drive right/left.</li> 
-     * <li>If straight ahead but not in range, the robot drives forward. </li>
-     */
-    public void getBall() { // GETS THE BALL
-        String command = lineUp(); // determines status of robot
-        String yCommand = closeY();
-        if (command != "Obey Driver" && yCommand != "No Ball Found") { // If robot doesn't have to obey driver and ball is found
-            if (command == "Straight" && yCommand == "Able") { // do if close to intake and straight ahead
-                broken = false; //ball is still in range
-                System.out.println("GET IT!");
-                Objects.driveTrain.arcadeDrive(.1, 0); //move forward
-                while (!Objects.index.ind0.get()) { //while ball isn't in index
-                    if (closeY() == "Unable" || lineUp() != "Straight") { // if ball moves out of position
-                        Objects.intake.intake(-1);
-                        broken = true;
-                        System.out.println("Out of Range");
-                        break;
-                    }
-                    System.out.println("Intake Down");
-                    Objects.intake.intake(0); //activate intake
-                }
-                if (broken == false) { //if we got the ball
-                    gotBall = true;
-                }
-            //repeats until it finds the ball in the right position again
-            }
-            else if (command == "Right" && yCommand == "Able") { // just orient right if ball is close and to the right
-                Objects.driveTrain.tankDrive(.1, -.1);
-                System.out.println("ORIENTING RIGHT");
-            }
-            else if (command == "Left" && yCommand == "Able") {// opposite of else if above
-                Objects.driveTrain.tankDrive(-.1, .1);
-                System.out.println("ORIENTING LEFT");
-            }
-            else if (command == "Straight") { // do if not close to intake but straight ahead
-                Objects.driveTrain.arcadeDrive(.15, 0);
-                System.out.println("STRAIGHT!");
-            }
-            else if (command == "Right") { // do if ball to the right
-                Objects.driveTrain.arcadeDrive(.15, .15);
-                System.out.println("RIGHT!");
-            }
-            else if (command == "Left") { // do if ball is to the left
-                Objects.driveTrain.arcadeDrive(.15, -.15);
-                System.out.println("LEFT!");
-            }
-        }
-        
-    else {
-            System.out.println("No Ball Found");
-        }
-    }
-    /**
-     * Determines the relative position of the ball to the robot. 
-     * Uses only the x value, and has a deadzone 40 pixels wide in the center
-     * @return string of the position of the ball: Right, Left, Straight, or Obey Driver (no ball)
-     */
-    public String lineUp() { // determines status of ball relative to robot
-        int x = Objects.fixedPixyCamVision.getPixyX();
-        // center of intake 170
-        if (x != -1) { // if no error
-            if (x > 190) { // if to right, deadzone 20 on each side of robot
-                return ("Right");
-            } else if (x < 150) {
-                return ("Left"); // if to the left
-            } else {
-                return ("Straight"); // If in deadzone, ball is straight ahead
-            }
-        } else {
-            return ("Obey Driver");
-        }
-    }
-    /**
-     * Takes into account y value of ball and determines if it is close enough to intake. 
-     * The logic is when the ball is below a certain part of the frame.
-     * @return String statement of the ability of the robot: Able, Unable, No Ball Found
-     */
-    public String closeY() {
-        int y = Objects.fixedPixyCamVision.getPixyY(); //
-        if (y != -1) { // If no error
-            if (y > 100) { // If close the intake (Value may change)
-                return ("Able");
-
-            } else {
-                return ("Unable");
-            }
-        } else { // In event of error, so no ball found
-            return ("No Ball Found");
-        }
-    }
 
     /**
-     * Rotates the robot until it finds a ball, then precisely rotates so the ball
-     * is in the center of the field of view.
-     * 
-     * @return
+     * Rotates and drives to the ball in one smooth motion
+     * <br><br>
+     * Rotation equation: https://www.desmos.com/calculator/zgfwpnir32
+     * Drive equation:    https://www.desmos.com/calculator/29julrgx6u
+     * @return True if the ball both meets X and Y constraints
      */
-    public boolean searchForBalls() {
-        int marginOfError = 15; // TODO: Change this to the correct +/- margin of error that the ball can be off of center
-        int currXPosition;
-        int minWidth=0;//TODO Rex- I intialized it only because the the variables below were causing errors. Nathan - 4/23
-        boolean hasLinedUp = false;
-        Objects.pixyCamVision.updatePixyCamData();
-        if (Objects.pixyCamVision.getWidth() < minWidth) { // if there are no valid targets, continue rotating
-            System.out.println("Turning and searching for balls.");
-            Objects.driveTrain.arcadeDrive(0, 0.1);
-        } else if (Objects.pixyCamVision.getWidth() > minWidth) {
-            System.out.println("Ball found. Lining up precisely.");
-            currXPosition = pixyLineUp();
-            if (currXPosition < marginOfError && currXPosition > -(marginOfError)) {
-                hasLinedUp = true;
-            }
-        }
-        if (hasLinedUp == true) {
-            System.out.println("Robot is lined up with the ball.");
-            Objects.driveTrain.arcadeDrive(0, 0);
-        } else {
-            System.out.println("Robot is still lining up precisely.");
-        }
-        return hasLinedUp;
-    }
-
-    /**
-     * Full sequence to look for and pick up one ball
-     * 
-     * If the robot is lined up with the ball, the robot drives forward at 10%
-     * power. When it gets close enough to the ball, it switches to intaking and
-     * moving a specific distance.
-     * 
-     * @return ballPickedUp - whether or not the robot has made an attempt at intaking a ball
-     */
-    public boolean driveToBall() {
-        int minY = 160;
-        boolean ballPickedUp = false;
-        double drivingSpeed = 0.1;
-        Objects.pixyCamVision.updatePixyCamData();
-
-        if (searchForBalls() == true && Objects.pixyCamVision.getY() > minY) {
-            System.out.println("Driving towards ball.");
-            Objects.driveTrain.arcadeDrive(drivingSpeed, 0);
-            pixyLineUp();
+    public boolean pixyFetch() { //you should only use arcade drive 2, as the two add to above 1
+        int X_Position = Objects.pixyCamVision.getPixyX(0);
+        int Y_Position = Objects.pixyCamVision.getPixyY(0);
+        int center = 166;
+        int maxY = 165; //increased to get robot to approach ball when intake down
+        double scaledPowerRotate = .4;
+        double scaledPowerDrive = .4;
+        double equationPower_Rotate = 13 / 9;
+        double equationPower_Drive = 13/ 9;
+        double rotationSpeed = scaledPowerRotate * (1 / Math.pow(center, equationPower_Rotate)) * (Math.pow((X_Position - center), equationPower_Rotate));
+        double driveSpeed = scaledPowerDrive * (1 / Math.pow(maxY, equationPower_Drive)) * (Math.pow((maxY - Y_Position), equationPower_Drive));
+        if (X_Position != -1) {
+            Objects.driveTrain.arcadeDrive(driveSpeed, rotationSpeed);
+            return (pixyStatus());
         }
         else {
-            Objects.intake.intake(0);
-            Objects.index.intakeIndex();
-            Objects.driveTrain.moveDistance(30, 0.1, true); //TODO: Determine drive distance
-            ballPickedUp = true;
+            Objects.driveTrain.tankDrive(0, 0);
+            return (false);
         }
-        return ballPickedUp;
+        
+        
+    }
+    /**
+     * Function checks to see if ball 
+     * @return Boolean that is true if ball is close enough to attempt to be indexed
+     */
+    public Boolean pixyStatus() {
+        int X_Position = Objects.pixyCamVision.getPixyX(0);
+        int Y_Position = Objects.pixyCamVision.getPixyY(0);
+        boolean xIsGood = (X_Position >= (166 - 6) && X_Position <= (166 + 6));
+        boolean yIsGood = (Y_Position >= (130) && Y_Position <= (145));
+        return xIsGood && yIsGood;
+    }
+    public void pickUpBall() {
+        if (!intakeDown) {
+            if (pixyFetch()) {
+                intakeDown = true;
+                Objects.intake.intake(0); //intake ball
+            }
+            else {
+                Objects.intake.intake(-1); //retract intake
+            }
+        }
+        else if (intakeDown) {
+            Objects.driveTrain.arcadeDrive(0.05, 0);
+            if (Objects.index.getInd0()) {
+                intakeDown = false;
+                Objects.driveTrain.arcadeDrive(0, 0);
+            }
+        }
+        else {
+            Objects.intake.intake(-1); //retract intake
+        }
     }
 
     /**
-     * Searches for balls, locks on to the target that the pixycam chooses, and then
-     * drives to each ball to pick it up
-     * 
-     * @param numBallsToFind
-     * <ul>
-     * <li>How many balls to search for and pick up</li>
-     * </ul>
+     * Evaluates if the ball is going into the intake and into the mecanum wheels
+     * @return Boolean that is true if the ball is in the mecanum wheels
      */
-    public void fullPixyCamSequence(int numBallsToFind) {
-        if (Objects.magicNumbers.numBallsPickedUp <= numBallsToFind && !Objects.magicNumbers.successfulCompletion) {
-            if (driveToBall() == true) {
-                Objects.magicNumbers.numBallsPickedUp++;
+    public Boolean checkForIntake() {
+        int X_Position = Objects.pixyCamVision.getPixyX(0);
+        int Y_Position = Objects.pixyCamVision.getPixyY(0);
+        boolean xIsGood = (X_Position >= (166 - 10) && X_Position <= (166 + 10));
+        boolean yIsGood = (Y_Position >= (125) && Y_Position <= (185)); //the point at which the ball is DEFINITELY intaked.
+        return xIsGood && yIsGood;
+    }
+
+    /**
+     * Full pixycam sequence to retrieve ball 
+     *      <li>Logic (not in order of if statments):</li>
+     *      <ul>
+     *           <li>If the intake isn't down, keep doing pixyFetch</li>
+     *           <li>If the intake is down but the ball is not in the intake keep doing pixyFetch</li>
+     *           <li>Check if the ball is close to being intaked with the y value, and set a bool to true</li>
+     *           <li>If the ball is in the mecanum wheels, wait until it's indexed, then move on to the next ball</li>
+     *      </ul>
+     */
+    public void pickUpBallWithIntake() {
+        if (intakeDown) { //if the intake is down
+            Objects.intake.intake(0); 
+            if (waiting) { //if we know the ball's about it be indexed, the ball is surely in the intake
+                if (waitingIntake && !Objects.index.getInd0()){
+                    waitingIntake = false;
+                    waiting = false;
+                    intakeDown = false;
+                    Objects.intake.intake(-1); 
+                }
+                else if (Objects.index.getInd0()) {
+                    waitingIntake = true;
+                    Objects.driveTrain.stop();
+                }
+                else {
+                    Objects.driveTrain.arcadeDrive2(.15, 0);
+                }
+            } 
+            else if (checkForIntake()) { //if the ball is still out there check if its about to go into the intake
+                waiting = true; 
             }
-        } else {
-            Objects.magicNumbers.numBallsPickedUp = 0;
-            Objects.magicNumbers.successfulCompletion = true;
+            else { //still manuever towards ball if the ball isn't about to be intaked and we're not waiting
+                pixyFetch();
+            } 
+        } 
+        else if (pixyFetch()) { //do pixyfetch until in range
+            intakeDown = true;
+            gotBall = false;
+            Objects.intake.intake(0);
+        } else { //the intake isn't down and the ball isn't in range  
         }
+    }
+public void pickUpBall2() {
+        if (waiting) { //if we know the ball's about it be indexed, the ball is surely in the intake
+            if (waitingIntake && !Objects.index.getInd0()){
+                waitingIntake = false;
+                waiting = false;
+                intakeDown = false;
+                Objects.intake.intake(-1); 
+            }
+            else if (Objects.index.getInd0()) {
+                waitingIntake = true;
+                Objects.driveTrain.stop();
+            }
+            else {
+                Objects.driveTrain.arcadeDrive2(.1, 0);
+            }
+        } 
+        else if (checkForIntake()) { //if the ball is still out there check if its about to go into the intake
+            waiting = true; 
+        }
+        else { //still manuever towards ball if the ball isn't about to be intaked and we're not waiting
+            pixyFetch();
+        } 
     }
 }

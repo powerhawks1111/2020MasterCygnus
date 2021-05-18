@@ -2,15 +2,25 @@ package frc.robot;
 
 import java.util.ArrayList;
 import frc.robot.commands.*;
+import frc.robot.subsystems.DriveTrain;
 import frc.robot.variables.Objects;
 
 public class Autonomous {
 
     private ArrayList<Command> commandsList;
     boolean start = false;
-
+    
     public Autonomous() {
         commandsList = new ArrayList<Command>();
+    }
+
+    public void moveDistanceTest() {
+        if (!start) {
+            Objects.visionSystems.turnLightOn();
+            commandsList.add(new MoveDistanceCommand(20, .2, true));
+            start = true;
+        }
+        startAutononous();
     }
 
     /**
