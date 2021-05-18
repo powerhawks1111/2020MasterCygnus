@@ -15,7 +15,7 @@ public class Climb {
      */
     public void retractPiston() {
         Objects.climbSolenoid1.set(Value.kReverse);
-        // Objects.climbSolenoid2.set(Value.kForward);
+        Objects.climbSolenoid2.set(Value.kReverse);
     }
 
     /**
@@ -23,7 +23,7 @@ public class Climb {
      */
     public void extendPiston() {
         Objects.climbSolenoid1.set(Value.kForward);
-        // Objects.climbSolenoid2.set(Value.kReverse);
+        Objects.climbSolenoid2.set(Value.kForward);
     }
 
     /**

@@ -4,40 +4,21 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
-
 import frc.robot.subsystems.pixy2api.Pixy2;
 import frc.robot.subsystems.pixy2api.Pixy2CCC.Block;
 import frc.robot.variables.Objects;
 
-public class PixyCamVision {
+public class FixedPixyCamVision {
     public Pixy2 pixycam = Pixy2.createInstance(Pixy2.LinkType.I2C);
     boolean isCamera = false; // Camera initialization status
     int state = -1; // error state of the PixyCam initialization
     int n = 0;
     int index = -1;
 
-    public PixyCamVision() {
+    public FixedPixyCamVision() {
         // constructor
     }
-    /**
-     * Method used to get the index of a certain object without errors
-     * @param Position array position you want to find
-     * @return index of position
-     */
-    public int getIndex (int Position) {
-        if (!isCamera) { // initializes if not initialized
-            state = pixycam.init();
-            isCamera = state >= 0;
-        }
-        pixycam.getCCC().getBlocks(false);
-        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
 
-        try {
-            return (blocks.get(Position).getIndex());
-        } catch (Exception e) {
-            return (-1); // ArrayList is empty, and there are no valid targets
-        }
-    }
     /**
      * Returns the x position of a tracked ball (it tracks the index). If the ball
      * is lost, it tracks the next biggest ball
@@ -47,25 +28,49 @@ public class PixyCamVision {
     public int trackBall() {
         pixycam.getCCC().getBlocks(false);
         ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
-        Boolean found = false;
-        if (index != getIndex(0)) { // if index isn't the same as first block in list
+        boolean found = false;
+        if (index == -1) { // intialize index
+            index = blocks.get(0).getIndex();
+        }
+        if (index != blocks.get(0).getIndex()) { // if index isn't the same
             for (int i = 0; i < blocks.size(); i++) { // find the index
-                if (index == getIndex(i)) {
+                if (index == blocks.get(i).getIndex()) {
                     found = true;
-                    return (getPixyX(i));
+                    return (blocks.get(i).getX());
                 }
             }
             if (!found) { // find the next biggest object
-                index = getIndex(0);
-                return (getPixyX(0));
+                index = blocks.get(0).getIndex();
+                return (blocks.get(0).getX());
             }
-        } 
-        else { // returns already tracked object
-            return (getPixyX(0));
+        } else { // returns already tracked object
+            return (blocks.get(0).getX());
         }
-        System.out.println("Something went wrong tracking the index");
-        return (getPixyX(0)); // idk why but VS code made me put this here
+        return blocks.get(0).getIndex(); // idk why but VS code made me put this here
 
+    }
+
+    /**
+     * Returns the average value of 10 PixyCam readings in order to smooth out the X
+     * value
+     * 
+     * @return Average value of 10 pixycam readings
+     */
+    public int smoothX() {
+        int i;
+        double value = 0;
+        int numReadings = 10;
+
+        if (getPixyX() != -1) {
+            for (i = 0; i < numReadings; i++) {
+                value = value + getPixyX();
+            }
+            value = value / numReadings;
+            System.out.println(value);
+            return ((int) value);
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -73,51 +78,49 @@ public class PixyCamVision {
      * x value for testing
      */
     public void statusUpdate() {
-        if (getPixyX(0) != -1) {
+        if (getPixyX() != -1) {
             Objects.visionSystems.turnLightOn();
         } else {
             Objects.visionSystems.turnLightOff();
         }
+        try {
+            System.out.println(trackBall());
+        } 
+        catch (Exception e) {
+            System.out.println("No Balls Found");
+        }
     }
 
     /**
-     * Returns the first instance of a pixyCam target that is roughly a square, like a ball.
-     * This should help filter out any objects that are yellow but not a ball.
-     * @return integer i, the index of the first square pixyCam target, or -1 if there are no targets.
+     * Returns the average value of 10 PixyCam readings in order to smooth out the Y
+     * value
+     * 
+     * @return Average value of 10 pixycam readings
      */
-    public int firstValidIndex() {
-        if (!isCamera) { // initializes if not initialized
-            state = pixycam.init();
-            isCamera = state >= 0;
-        }
-        pixycam.getCCC().getBlocks(false);
-        ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
-        try {
-            for (int i = 0; i < blocks.size(); i++) {
-                int X_Position = blocks.get(i).getX();
-                int Y_Position = blocks.get(i).getY();
-                boolean isASquare = (Y_Position >= X_Position - 5) || (Y_Position <= X_Position + 5);
-                if (isASquare) {
-                    return i;
-                }
-            }
-        }
+    public int smoothY() {
+        int i;
+        double value = 0;
+        int numReadings = 10;
 
-        catch(Exception e) {
+        if (getPixyX() != -1) {
+            for (i = 0; i < numReadings; i++) {
+                value = value + getPixyY();
+            }
+            value = value / numReadings;
+            return ((int) value);
+        } else {
             return -1;
         }
-
-        return -1;
     }
 
     /**
      * Uses the Pixy2 API to request and return the X-position of the first PixyCam
      * target. The first object in the array has the largest area.
-     * @param Position - the index of the object in the array you want to get X for
+     * 
      * @return X-Position (in pixels from the left of the image) of the first Pixy
-     *         target (-1 if there are no targets to track)
+     *         target
      */
-    public int getPixyX(int Position) {
+    public int getPixyX() {
         if (!isCamera) { // initializes if not initialized
             state = pixycam.init();
             isCamera = state >= 0;
@@ -126,7 +129,7 @@ public class PixyCamVision {
         ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
 
         try {
-            return (blocks.get(Position).getX());
+            return (blocks.get(0).getX());
         } catch (Exception e) {
             return (-1); // ArrayList is empty, and there are no valid targets
         }
@@ -136,11 +139,11 @@ public class PixyCamVision {
     /**
      * Uses the Pixy2 API to request and return the Y-position of the first PixyCam
      * target. The largest object in the array has the largest area.
-     * @param Position - the index of the object in the array you want to get Y for
+     * 
      * @return Y-Position (in pixels from the top of the image) of the first Pixy
-     *         target (-1 if there are no targets to track)
+     *         target
      */
-    public int getPixyY(int Position) {
+    public int getPixyY() {
         if (!isCamera) {
             state = pixycam.init();
             isCamera = state >= 0;
@@ -150,10 +153,10 @@ public class PixyCamVision {
         ArrayList<Block> blocks = pixycam.getCCC().getBlockCache();
 
         try {
-            return (blocks.get(Position).getY());
+            return (blocks.get(0).getY());
         } catch (Exception e) {
             return (-1); // ArrayList is empty, and there are no valid targets
-        } 
+        }
 
     }
 

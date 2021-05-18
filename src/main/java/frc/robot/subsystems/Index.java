@@ -36,7 +36,7 @@ public class Index {
     }
 
     /**
-     * TODO: Needs comment
+     * Sets whether or not the index is flushing.
      * @param flushIndex
      */
     public void setFlush(boolean flushIndex) {

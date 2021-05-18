@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import frc.robot.variables.ControllerMap;
+import frc.robot.variables.ControllerMapGamepad;
 import frc.robot.variables.Motors;
 import frc.robot.variables.Objects;
 import com.revrobotics.ControlType;
@@ -19,7 +19,7 @@ public class Outtake {
     public double kP = 0.00005; 
     public double kI = 0.0000005;
     public double kD = 0.0000000001;
-    boolean charging = false;
+    public boolean charging = false;
 
     /**
      * Constructor
@@ -172,7 +172,7 @@ public class Outtake {
     }
 
     public void fireSequenceTest(int setPoint) {
-        if (Objects.driverJoy.getRawButton(ControllerMap.X_BUTTON)) {
+        if (Objects.driverJoy.getRawButton(ControllerMapGamepad.X_BUTTON)) {
             fire3(setPoint);
         }
     }

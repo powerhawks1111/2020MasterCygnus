@@ -23,10 +23,11 @@ public class Objects {
     public static DriveTrain driveTrain = new DriveTrain();
     public static Index index = new Index(Robot.pcStartCount.getSelected());
     public static Intake intake = new Intake();
-    public static Joystick driverJoy = new Joystick(ControllerMap.DRIVER_PORT);
-    public static Joystick operatorJoy = new Joystick(ControllerMap.OPERATOR_PORT);
+    public static Joystick driverJoy = new Joystick(ControllerMapGamepad.DRIVER_PORT);
+    public static Joystick operatorJoy = new Joystick(ControllerMapGamepad.OPERATOR_PORT);
     public static MagicNumbers magicNumbers = new MagicNumbers();
     public static Outtake outtake = new Outtake();
+    public static deprecatedPixyCamOperate deprecatedPixyCamOperate = new deprecatedPixyCamOperate();
     public static PixyCamVision pixyCamVision = new PixyCamVision();
     public static PixyCamOperate pixyCamOperate = new PixyCamOperate();
     public static Relay relay = new Relay(0, Direction.kReverse);

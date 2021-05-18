@@ -12,9 +12,9 @@ public class MoveDistanceCommand implements Command {
     public boolean complete;
 
     /**
-     * Autonomous command constructor to move the robot forward a certain distance TODO: units!
+     * Autonomous command constructor to move the robot forward a certain distance
      * @param t
-     * <ul><li>targetDistance (TODO: units!)</li></ul>
+     * <ul><li>targetDistance in inches</li></ul>
      * @param p
      * <ul><li>power (-1 to 1, inclusive)</li></ul>
      * @param d
