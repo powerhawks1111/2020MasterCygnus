@@ -97,6 +97,7 @@ public class Index {
 
     /**
      * As long as the index isn't being flushed, it will poll the intake, outtake, and stop functions
+     * Called by the Index function which is called by Operator.operate
      */
     public void backgroundIndex() {
         if (!flushIndex) {
@@ -127,7 +128,9 @@ public class Index {
     }
 
     /**
-     * Advances the balls to the outtake flywheel based on the 60hz loop timer
+     * Advances the balls to the outtake flywheel based on the 60hz loop timer.
+     * This checks the status of the charging and shooting variables in Outtake.java
+     * and responds accodgingly. Called by background index function.
      * To quote my friend Cygnus, "YEET!"
      */
     public void outtakeIndex() {

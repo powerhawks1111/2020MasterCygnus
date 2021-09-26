@@ -97,7 +97,7 @@ public class PixyCamOperate {
 
     /**
      * Evaluates if the ball is going into the intake and into the mecanum wheels
-     * @return Boolean that is true if the ball is in the mecanum wheels
+     * @return True if the ball is in the mecanum wheels
      */
     public Boolean checkForIntake() {
         int X_Position = Objects.pixyCamVision.getPixyX(0);

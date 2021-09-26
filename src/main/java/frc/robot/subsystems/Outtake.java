@@ -18,8 +18,9 @@ public class Outtake {
     public static boolean isRev;
     public double kP = 0.00005; 
     public double kI = 0.0000005;
-    public double kD = 0.0000000001;
-    public boolean charging = false;
+    public double kD = 0.00000000001;
+    public boolean charging = false; // when true, background index advances balls to shooter
+    public boolean overShot = false; // when true, background index purges index through shooter
 
     /**
      * Constructor
@@ -28,9 +29,14 @@ public class Outtake {
         isRev = false;
         pidController = Motors.outLeader.getPIDController();
         encoder = Motors.outLeader.getEncoder();
-        kP = 0.00005; 
+        // kP = 0.00005; 
+        // kI = 0.0000005;
+        // kD = 0.0000000001;
+        // kFF = 0.0000; 
+
+        kP = 0.0001; 
         kI = 0.0000005;
-        kD = 0.0000000001;
+        kD = 0.00001;
         kFF = 0.0000; 
         kMaxOutput = 1; 
         kMinOutput = -1;
@@ -52,16 +58,16 @@ public class Outtake {
         SmartDashboard.putNumber("Velocity", encoder.getVelocity());
     }
 
-    public void fire(final double percentPower) {
-        System.out.println(Motors.outLeader.getEncoder().getVelocity());
-        Motors.outLeader.setVoltage(percentPower);
-        Motors.outFollower.follow(Motors.outLeader, true);
-    }
-
     public void moveUp(final double percent) {
         Motors.moveUp.set(-percent);
         Motors.indexLead.set(-percent);
         Motors.indexFollower.follow(Motors.indexLead);
+    }
+
+    public void fire(final double percentPower) {
+        System.out.println(Motors.outLeader.getEncoder().getVelocity());
+        Motors.outLeader.setVoltage(percentPower);
+        Motors.outFollower.follow(Motors.outLeader, true);
     }
 
     public void fire2(final double setPoint) {
@@ -91,17 +97,52 @@ public class Outtake {
     
     public void fire4(final double setPoint) {
         charging = true;
+        int rpmWindow = 80;
         pidController.setReference(-setPoint, ControlType.kVelocity);
         Motors.outFollower.follow(Motors.outLeader, true);
-        SmartDashboard.putNumber("Velocity", encoder.getVelocity());
+        SmartDashboard.putNumber("Velocity", -encoder.getVelocity());
         SmartDashboard.putNumber("Set point", setPoint);
-        if ((encoder.getVelocity() > (-setPoint) - 40) && (encoder.getVelocity() < (-setPoint) + 40)) {
+        SmartDashboard.putNumber("Error", (setPoint) - (-encoder.getVelocity()));
+        if ((encoder.getVelocity() > (-setPoint) - rpmWindow) && (encoder.getVelocity() < (-setPoint) + rpmWindow)) {
             charging = false;
             isShooting = true;
+    
+            SmartDashboard.putBoolean("In Range?", true);
         } else {
             charging = true;
             isShooting = false;
+            SmartDashboard.putBoolean("In Range?", false);
         } 
+    }
+
+
+    public void fire5(final double setPoint) {
+        charging = true;
+        int overShoot = 200;
+
+        double currentMotorVelocity = encoder.getVelocity();
+
+        SmartDashboard.putNumber("Velocity", -currentMotorVelocity);
+        SmartDashboard.putNumber("Set point", setPoint);
+        SmartDashboard.putNumber("Error", (setPoint) - (-currentMotorVelocity));
+
+        if ((currentMotorVelocity < (-setPoint + overShoot))) {
+            pidController.setReference(-setPoint + overShoot, ControlType.kVelocity);
+            Motors.outFollower.follow(Motors.outLeader, true);
+        }
+        else {
+            pidController.setReference(-setPoint, ControlType.kVelocity);
+            Motors.outFollower.follow(Motors.outLeader, true);
+        }
+
+        if ((currentMotorVelocity > (-setPoint) - 80) && (currentMotorVelocity < (-setPoint) + 80)) {
+            charging = false;
+            isShooting = true;
+        }
+        else {
+            charging = true;
+            isShooting = false;
+        }
     }
 
     /**
@@ -124,6 +165,7 @@ public class Outtake {
         }
         return velocity;
     }
+    
     public double heightToDistance(double height) {
         return ((height * height) * 0.0066) - (1.175 * height) + 60.31;
     }
@@ -137,7 +179,7 @@ public class Outtake {
     }
 
     public void middleShoot() { //trench
-        fire4(3900);
+        fire5(4500);
     }
 
     public void closeShoot() { //white line
