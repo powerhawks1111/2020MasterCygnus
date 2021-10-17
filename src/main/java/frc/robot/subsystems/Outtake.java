@@ -29,9 +29,9 @@ public class Outtake {
         isRev = false;
         pidController = Motors.outLeader.getPIDController();
         encoder = Motors.outLeader.getEncoder();
-        // kP = 0.00005; 
-        // kI = 0.0000005;
-        // kD = 0.0000000001;
+        // kP = .0004; //oscilation at 0.0015 
+        // kI = 0.000001;
+        // kD = 10;
         // kFF = 0.0000; 
 
         kP = 0.0001; 
@@ -73,8 +73,18 @@ public class Outtake {
     public void fire2(final double setPoint) {
         pidController.setReference(-setPoint, ControlType.kVelocity);
         Motors.outFollower.follow(Motors.outLeader, true);
-        if ((encoder.getVelocity() > (-setPoint) - 70) && (encoder.getVelocity() < (-setPoint) + 70)) {
+        double currentMotorVelocity = encoder.getVelocity();
+        SmartDashboard.putNumber("Velocity", -currentMotorVelocity);
+        SmartDashboard.putNumber("Set point", setPoint);
+        SmartDashboard.putNumber("Error", (setPoint) - (-encoder.getVelocity()));
+
+        if ((currentMotorVelocity > (-setPoint) - 70) && (currentMotorVelocity < (-setPoint) + 70)) {
+            charging = false;
             isShooting = true;
+        }
+        else {
+            charging = true;
+            isShooting = false;
         }
     }
 
@@ -118,7 +128,7 @@ public class Outtake {
 
     public void fire5(final double setPoint) {
         charging = true;
-        int overShoot = 200;
+        int overShoot = 400;
 
         double currentMotorVelocity = encoder.getVelocity();
 
@@ -126,8 +136,8 @@ public class Outtake {
         SmartDashboard.putNumber("Set point", setPoint);
         SmartDashboard.putNumber("Error", (setPoint) - (-currentMotorVelocity));
 
-        if ((currentMotorVelocity < (-setPoint + overShoot))) {
-            pidController.setReference(-setPoint + overShoot, ControlType.kVelocity);
+        if ((currentMotorVelocity < (-setPoint + overShoot-100))) {
+            pidController.setReference(-setPoint + overShoot,ControlType.kVelocity);
             Motors.outFollower.follow(Motors.outLeader, true);
         }
         else {
@@ -143,6 +153,10 @@ public class Outtake {
             charging = true;
             isShooting = false;
         }
+    }
+
+    public void fire6(final double setpoint) {
+        
     }
 
     /**
@@ -183,9 +197,12 @@ public class Outtake {
     }
 
     public void closeShoot() { //white line
-        fire4(3700); 
+        fire2(4500); 
     }
     
+    public void rpmShoot(int velocity) {
+        fire2(velocity);
+    }
     public void firePercent(final double percent) {
         Motors.outLeader.set(percent);
         Motors.outFollower.follow(Motors.outLeader, true);

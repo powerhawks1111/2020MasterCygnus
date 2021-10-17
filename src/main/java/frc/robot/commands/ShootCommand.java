@@ -24,7 +24,8 @@ public class ShootCommand implements Command {
         if (!lineup) {
             timer.start();
         }
-        Objects.outtake.isShooting = false;
+        Objects.outtake.isShooting = true;
+        Objects.outtake.charging = true;
     }
 
     /**
@@ -40,7 +41,7 @@ public class ShootCommand implements Command {
         if (!lineup) {
             timer.start();
         }
-        Objects.outtake.isShooting = false;
+        Objects.outtake.isShooting = true; //was false
     }
 
     /**
@@ -57,7 +58,7 @@ public class ShootCommand implements Command {
             if (velocity == -1) {
                 Objects.outtake.fire4(Objects.vision.autoShoot(Objects.vision.getFittedHeight()));
             } else {
-                Objects.outtake.fire4(velocity);
+                Objects.outtake.rpmShoot(velocity);
             }
         // }
     }

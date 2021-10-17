@@ -1,6 +1,7 @@
 package frc.robot;
 
 import frc.robot.variables.ControllerMapGamepad;
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 import frc.robot.variables.Objects;
 
 public class Driver {
@@ -11,12 +12,15 @@ public class Driver {
 
     public void drive() {
         //arcadeDrive();
-        cubeDrive();
+        // cubeDrive();
+        diamondDriveCubic();
+        // diamondDriveCubicRateLimiter();
         // autonomousShoot();
         activeClimb();
         //autonomousLineUp();
         //turnLightsOff();
-        pixyCamAutonomousTest();
+        // pixyCamAutonomousTest();
+        // manualIntake();
     }
 
     public void arcadeDrive() {
@@ -38,6 +42,39 @@ public class Driver {
             Objects.driveTrain.arcadeDrive(Objects.driveTrain.cubicDriveCalculator(Objects.driverJoy.getRawAxis(ControllerMapGamepad.L_STICKY)), 
             (Objects.driveTrain.cubicDriveCalculator(Objects.driverJoy.getRawAxis(ControllerMapGamepad.R_STICKX))));
         } else if(!Objects.vision.autoLineup && !Objects.pixyCamOperate.lineup) {
+            Objects.driveTrain.stop();
+        }
+    }
+
+    public final SlewRateLimiter m_throttleLimit = new SlewRateLimiter(3);
+    public final SlewRateLimiter m_rotateLimit = new SlewRateLimiter(3);
+    public void diamondDriveCubic() {
+        double throttleSpeed = m_throttleLimit.calculate(Objects.driverJoy.getRawAxis(ControllerMapGamepad.L_STICKY));
+        double rotateSpeed = m_rotateLimit.calculate(Objects.driverJoy.getRawAxis(ControllerMapGamepad.R_STICKX));
+
+        double deadband = 0.03;
+        if (   Objects.driverJoy.getRawAxis(ControllerMapGamepad.L_STICKY) >= deadband
+            || Objects.driverJoy.getRawAxis(ControllerMapGamepad.R_STICKX) >= deadband
+            || Objects.driverJoy.getRawAxis(ControllerMapGamepad.L_STICKY) <= -deadband
+            || Objects.driverJoy.getRawAxis(ControllerMapGamepad.R_STICKX) <= -deadband) {
+            Objects.driveTrain.diamondDrive(Objects.driveTrain.cubicDriveCalculator(throttleSpeed), 
+            (Objects.driveTrain.cubicDriveCalculatorRotate(rotateSpeed)), false);
+        } 
+        else if(!Objects.vision.autoLineup && !Objects.pixyCamOperate.lineup) {
+            Objects.driveTrain.stop();
+        }
+    }
+
+    public void diamondDriveCubicRateLimiter() {
+        double deadband = 0.03;
+        if (   Objects.driverJoy.getRawAxis(ControllerMapGamepad.L_STICKY) >= deadband
+            || Objects.driverJoy.getRawAxis(ControllerMapGamepad.R_STICKX) >= deadband
+            || Objects.driverJoy.getRawAxis(ControllerMapGamepad.L_STICKY) <= -deadband
+            || Objects.driverJoy.getRawAxis(ControllerMapGamepad.R_STICKX) <= -deadband) {
+            Objects.driveTrain.diamondDriveRateLimiter(Objects.driveTrain.cubicDriveCalculator(Objects.driverJoy.getRawAxis(ControllerMapGamepad.L_STICKY)), 
+            (Objects.driveTrain.cubicDriveCalculator(Objects.driverJoy.getRawAxis(ControllerMapGamepad.R_STICKX))), false);
+        } 
+        else if(!Objects.vision.autoLineup && !Objects.pixyCamOperate.lineup) {
             Objects.driveTrain.stop();
         }
     }
@@ -84,6 +121,16 @@ public class Driver {
         }
     }
 
+    public void manualIntake() {
+        if (Objects.driverJoy.getRawButton(ControllerMapGamepad.A_BUTTON)) {
+            System.out.println("test out");
+            Objects.intake.intake(0);
+        }
+        else {
+            // Objects.intake.intake(-1);
+            // System.out.println("test in");
+        }
+    }
     public void pixyCamAutonomousTest() {
         if (Objects.driverJoy.getRawButton(ControllerMapGamepad.Y_BUTTON)) {
             Objects.pixyCamOperate.lineup = true; //true if y button pressed --> don't stop drivetrain
@@ -92,7 +139,7 @@ public class Driver {
         }
         else {
             Objects.pixyCamOperate.lineup = false;
-            Objects.pixyCamVision.statusUpdate();
+            // Objects.pixyCamVision.statusUpdate();
             Objects.pixyCamOperate.intakeDown = false;
             Objects.pixyCamOperate.waiting = false;
             Objects.pixyCamOperate.waitingIntake = false;

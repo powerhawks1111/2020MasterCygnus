@@ -70,7 +70,7 @@ public class Autonomous {
     }
 
     /**
-     * starts facing target directly. Picks up 2 balls from rondezvous, shoots
+     * starts facing target directly. Picks up 2 balls from rendezvous, shoots
      */
     public void yellowPath() {
         if (!start) {
@@ -119,8 +119,9 @@ public class Autonomous {
      */
     public void bluePath() {
         if (!start) {
-            Objects.visionSystems.turnLightOn();
-            commandsList.add(new ShootCommand(3350, false)); 
+            Objects.index.moveCells(.6);
+            // Objects.visionSystems.turnLightOn();
+            commandsList.add(new ShootCommand(3900, false)); 
             commandsList.add(new MoveDistanceCommand(48, 0.2, false)); 
             start = true;
         }

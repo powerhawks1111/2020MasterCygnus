@@ -39,19 +39,19 @@ public class Operator {
 
     public void farShoot() {
         if (Objects.operatorJoy.getRawButton(ControllerMapGamepad.Y_BUTTON)) {
-            Objects.outtake.farShoot();
+            Objects.outtake.rpmShoot(5194);
         } 
     }
 
     public void middleShoot() {
         if (Objects.operatorJoy.getRawButton(ControllerMapGamepad.X_BUTTON)) {
-            Objects.outtake.middleShoot();
+            Objects.outtake.rpmShoot(4547);
         }
     }
 
     public void closeShoot() {
         if (Objects.operatorJoy.getRawButton(ControllerMapGamepad.A_BUTTON)) {
-            Objects.outtake.closeShoot();
+            Objects.outtake.rpmShoot(3900);
         }
     }
 
@@ -69,7 +69,7 @@ public class Operator {
         if (Objects.operatorJoy.getRawButton(ControllerMapGamepad.L_BUMPER)
             && !Objects.operatorJoy.getRawButton(ControllerMapGamepad.R_BUMPER)) {
             Objects.intake.intake(MagicNumbers.intake);
-        } else if (Objects.operatorJoy.getRawButton(ControllerMapGamepad.L_BUMPER)
+        } else if (!Objects.operatorJoy.getRawButton(ControllerMapGamepad.L_BUMPER)
                    && Objects.operatorJoy.getRawButton(ControllerMapGamepad.R_BUMPER)) {
                    Objects.intake.intake(MagicNumbers.purgeIntake);
         } else if (!Objects.pixyCamOperate.lineup){

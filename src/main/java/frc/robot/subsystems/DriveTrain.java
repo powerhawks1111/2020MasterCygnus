@@ -32,7 +32,7 @@ public class DriveTrain {
     /**
      * Drives the robot with a maximum motor acceleration
      * @param left - Speed to drive the motors from -1 to 1, inclusive
-     * @param maxAcc - Maximum acceleration, in RPM^2
+     * @param maxAcc - Maximum acceleration, in RPM/S
      */
     public void trapezoidTankDrive(double left, double right, int maxAcc) {
         Motors.rightFrontPID.setSmartMotionMaxAccel(maxAcc, 0);
@@ -56,7 +56,21 @@ public class DriveTrain {
     public double cubicDriveCalculator(double value) {
         //not actually cubic!
         //Usually .8 but tested at .4
-        double cubicFn = .4 * Math.pow(value, 3);
+        double cubicFn = Math.pow(value, 3);
+        return cubicFn;
+    }
+
+    /**
+     * Calculates the speed to drive the motors using a cubic (just x^3) equation and an input joystick value
+     * @param value
+     * <ul><li>Value of the joystick between -1 and 1, inclusive</li></ul>
+     * @return cubicFn
+     * <ul><li>Motor speed percentage between -1 and 1, inclusive</li></ul>
+     */
+    public double cubicDriveCalculatorRotate(double value) {
+        //not actually cubic!
+        //Usually .8 but tested at .4
+        double cubicFn = Math.pow(value, 5/3);
         return cubicFn;
     }
 
@@ -108,6 +122,89 @@ public class DriveTrain {
         Motors.leftFront.set(-scale * (speed - rotate));
         Motors.leftBack.follow(Motors.leftFront, false);
         Motors.rightFront.set(scale * (speed + rotate));
+        Motors.rightBack.follow(Motors.rightFront, false);
+    }
+
+    /**
+     * Applies a diamond throttle map to the stick inputs to eliminate control deadzones or overruns
+     * @param throttle
+     * <ul><li>Throttle stick input, from -1 to 1 inclusive</li></ul>
+     * @param turnVal
+     * <ul><li>Turn stick input, from -1 to 1 inclusive</li></ul>
+     * @param reverse
+     * <ul><li>When true, switches the "forward" direction</li></ul>
+     */
+    public void diamondDrive(double throttle, double turnVal, boolean reverse) {
+        // turn is x, throttle is y
+
+        turnVal *= 0.3;
+        double direction = reverse ? -1 : 1;
+        double scaledPower = 1;
+        //convert to polar
+        double originalRadius = Math.hypot(turnVal, throttle);
+        double originalAngle = Math.atan2(throttle, turnVal);
+
+        // rotate by 45 degrees
+        originalAngle += Math.PI / 4;
+
+        // back to cartesian
+        double left = originalRadius * Math.cos(originalAngle);
+        double right = originalRadius * Math.sin(originalAngle);
+
+        // rescale coords
+        left *= Math.sqrt(2);
+        right *= Math.sqrt(2);
+
+        // clamp to -1/+1
+        left = Math.max(-1, Math.min(left, 1));
+        right = Math.max(-1, Math.min(right, 1));
+
+        Motors.leftFront.set(direction * scaledPower * left);
+        Motors.leftBack.follow(Motors.leftFront, false);
+        Motors.rightFront.set(direction * scaledPower * right);
+        Motors.rightBack.follow(Motors.rightFront, false);
+    }
+
+        /**
+     * Applies a diamond throttle map to the stick inputs to eliminate control deadzones or overruns
+     * @param throttle
+     * <ul><li>Throttle stick input, from -1 to 1 inclusive</li></ul>
+     * @param turnVal
+     * <ul><li>Turn stick input, from -1 to 1 inclusive</li></ul>
+     * @param reverse
+     * <ul><li>When true, switches the "forward" direction</li></ul>
+     */
+    public void diamondDriveRateLimiter(double throttle, double turnVal, boolean reverse) {
+        // turn is x, throttle is y
+        double direction = reverse ? -1 : 1;
+        double scaledPower = 1;
+        double maximumAcceleration = 5200;
+        double maxRPM = 5200;
+        //convert to polar
+        double originalRadius = Math.hypot(turnVal, throttle);
+        double originalAngle = Math.atan2(throttle, turnVal);
+
+        // rotate by 45 degrees
+        originalAngle += Math.PI / 4;
+
+        // back to cartesian
+        double left = originalRadius * Math.cos(originalAngle);
+        double right = originalRadius * Math.sin(originalAngle);
+
+        // rescale coords
+        left *= Math.sqrt(2);
+        right *= Math.sqrt(2);
+
+        // clamp to -1/+1
+        left = Math.max(-1, Math.min(left, 1));
+        right = Math.max(-1, Math.min(right, 1));
+
+        Motors.leftFrontPID.setSmartMotionMaxAccel(maximumAcceleration, 0);
+        Motors.rightFrontPID.setSmartMotionMaxAccel(maximumAcceleration, 0);
+
+        Motors.leftFrontPID.setReference(direction * scaledPower * left * maxRPM, ControlType.kSmartVelocity, 0);
+        Motors.leftBack.follow(Motors.leftFront, false);
+        Motors.rightFrontPID.setReference(direction * scaledPower * right * maxRPM, ControlType.kSmartVelocity, 0);
         Motors.rightBack.follow(Motors.rightFront, false);
     }
 
